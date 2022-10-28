@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -29,15 +30,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    private UserEntityRepository userEntityRepository;
+    private final UserEntityRepository userEntityRepository;
 
-    private RoleEntityRepository roleEntityRepository;
+    private final RoleEntityRepository roleEntityRepository;
 
-    private PasswordEncoder encoder;
+    private final PasswordEncoder encoder;
 
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
 
     public AuthController(AuthenticationManager authenticationManager, UserEntityRepository userEntityRepository, RoleEntityRepository roleEntityRepository, PasswordEncoder encoder, JwtUtils jwtUtils) {
@@ -59,14 +60,14 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
-                userDetails.getImageUrl(),
                 userDetails.getEmail(),
+                userDetails.getImageUrl(),
                 roles
         ));
     }
