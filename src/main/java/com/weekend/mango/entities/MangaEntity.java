@@ -48,7 +48,7 @@ public class MangaEntity {
             name ="manga_page",
             joinColumns = @JoinColumn(name = "manga_id"),
             inverseJoinColumns = @JoinColumn(name = "page_id"))
-    private List<PageEntity>  page = new ArrayList<>();
+    private List<PageEntity> page = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
