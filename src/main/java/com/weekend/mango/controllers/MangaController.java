@@ -241,4 +241,14 @@ public class MangaController {
 
         return ResponseEntity.ok(mangaModel);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String,Boolean>> deleteManga(@PathVariable Long id) throws Exception {
+        boolean deleted;
+        deleted = mangaService.deleteManga(id);
+        Map<String,Boolean> response = new HashMap<>();
+        response.put("deleted",deleted);
+
+        return ResponseEntity.ok(response);
+    }
 }

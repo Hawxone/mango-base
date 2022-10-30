@@ -26,6 +26,10 @@ public class PageServiceImpl implements PageService {
         return mangaEntityRepository.findById(id);
     }
 
+    Optional<PageEntity> getPage(String file){
+        return pageEntityRepository.findPageEntityByFile(file);
+    }
+
     @Override
     public List<PageModel> getPagesByMangaId(Long mangaId) throws Exception {
 
@@ -52,6 +56,12 @@ public class PageServiceImpl implements PageService {
     @Override
     public PageModel createMangaPage(Long mangaId, PageModel pageModel) throws Exception {
 
+        Optional<PageEntity> isDuplicate = getPage(pageModel.getFile());
+
+        if (isDuplicate.isPresent()){
+            return null;
+        }
+
         try {
             Optional<MangaEntity> fetchManga = getManga(mangaId);
 
@@ -71,7 +81,21 @@ public class PageServiceImpl implements PageService {
         }catch (Exception e){
             throw new Exception("can't save entry " + e);
         }
+    }
 
-
+    @Override
+    public boolean deletePage(Long id, Long mangaId) throws Exception {
+        try {
+            Optional<MangaEntity> fetchManga =getManga(mangaId);
+            if (fetchManga.isPresent()){
+                Optional<PageEntity> fetchPage = pageEntityRepository.findPageEntityByIdAndMangaId(id,fetchManga.get());
+                fetchPage.ifPresent(pageEntity -> pageEntityRepository.delete(pageEntity));
+            }else {
+                throw new Exception("manga not found!");
+            }
+        }catch (Exception e){
+            throw new Exception("can't delete entry " + e);
+        }
+        return true;
     }
 }

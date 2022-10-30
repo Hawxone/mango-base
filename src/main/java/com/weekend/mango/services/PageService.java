@@ -8,4 +8,6 @@ public interface PageService {
     List<PageModel> getPagesByMangaId(Long mangaId) throws Exception;
 
     PageModel createMangaPage(Long mangaId, PageModel pageModel) throws Exception;
+
+    boolean deletePage(Long id, Long mangaId) throws Exception;
 }

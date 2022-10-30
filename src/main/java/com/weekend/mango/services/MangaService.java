@@ -12,4 +12,6 @@ public interface MangaService {
     Manga getMangaById(Long id) throws Exception;
 
     Manga saveManga(Long id,Manga mangaModel) throws Exception;
+
+    boolean deleteManga(Long id) throws Exception;
 }

@@ -388,4 +388,16 @@ public class MangaServiceImpl implements MangaService{
 
         return mangaModel;
     }
+
+    @Override
+    public boolean deleteManga(Long id) throws Exception {
+        try {
+            Optional<MangaEntity> fetchManga = mangaEntityRepository.findById(id);
+            fetchManga.ifPresent(mangaEntity -> mangaEntityRepository.delete(mangaEntity));
+        }catch (Exception e){
+            throw new Exception("can't delete entry" + e);
+        }
+
+        return true;
+    }
 }
