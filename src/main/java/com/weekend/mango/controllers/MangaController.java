@@ -96,7 +96,6 @@ public class MangaController {
         String category = request.get("category");
         String comment = request.get("comment");
         String mangaUser = request.get("mangaUser");
-        String pageModel = request.get("pageModel");
         String group = request.get("group");
         String character = request.get("character");
         String tag = request.get("tag");
@@ -107,7 +106,6 @@ public class MangaController {
         JsonArray categoryJSON = new Gson().fromJson(category, JsonArray.class);
         JsonArray commentJSON = new Gson().fromJson(comment, JsonArray.class);
         JsonArray mangaUserJSON = new Gson().fromJson(mangaUser, JsonArray.class);
-        JsonArray pageModelJSON = new Gson().fromJson(pageModel, JsonArray.class);
         JsonArray groupJSON = new Gson().fromJson(group, JsonArray.class);
         JsonArray characterJSON = new Gson().fromJson(character, JsonArray.class);
         JsonArray tagJSON = new Gson().fromJson(tag, JsonArray.class);
@@ -122,7 +120,6 @@ public class MangaController {
         List<Category> categoryList = new ArrayList<>();
         List<Comment> commentList = new ArrayList<>();
         List<MangaUser> mangaUserList = new ArrayList<>();
-        List<PageModel> pageModelList = new ArrayList<>();
         List<Group> groupList = new ArrayList<>();
         List<Character> characterList = new ArrayList<>();
         List<Tag> tagList = new ArrayList<>();
@@ -171,16 +168,6 @@ public class MangaController {
             }
         }
 
-        if (!pageModel.isBlank()){
-            for (JsonElement a:pageModelJSON
-            ) {
-                PageModel pageModelModel = new PageModel();
-                pageModelModel.setId(a.getAsJsonObject().get("id").getAsLong());
-                pageModelModel.setPageOrder(a.getAsJsonObject().get("pageOrder").getAsInt());
-                pageModelModel.setFile(a.getAsJsonObject().get("file").getAsString());
-                pageModelList.add(pageModelModel);
-            }
-        }
 
         if (!group.isBlank()){
             for (JsonElement a:groupJSON
@@ -222,7 +209,6 @@ public class MangaController {
             }
         }
 
-
         Manga mangaModel = new Manga();
         mangaModel.setId(id);
         mangaModel.setTitle(title);
@@ -245,7 +231,6 @@ public class MangaController {
         mangaModel.setCategory(categoryList);
         mangaModel.setComment(commentList);
         mangaModel.setMangaUser(mangaUserList);
-        mangaModel.setPageModel(pageModelList);
         mangaModel.setGroup(groupList);
         mangaModel.setCharacter(characterList);
         mangaModel.setTag(tagList);

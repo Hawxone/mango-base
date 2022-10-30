@@ -18,16 +18,45 @@ public class MangaServiceImpl implements MangaService{
 
     private MangaEntityRepository mangaEntityRepository;
     private UserEntityRepository userEntityRepository;
+    private ArtistEntityRepository artistEntityRepository;
+    private CategoryEntityRepository categoryEntityRepository;
+    private CharacterEntityRepository characterEntityRepository;
+    private GroupEntityRepository groupEntityRepository;
+    private ParodyEntityRepository parodyEntityRepository;
+    private TagEntityRepository tagEntityRepository;
 
 
-    public MangaServiceImpl(MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository) {
+    public MangaServiceImpl(MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository, ArtistEntityRepository artistEntityRepository, CategoryEntityRepository categoryEntityRepository, CharacterEntityRepository characterEntityRepository, GroupEntityRepository groupEntityRepository, ParodyEntityRepository parodyEntityRepository, TagEntityRepository tagEntityRepository) {
         this.mangaEntityRepository = mangaEntityRepository;
         this.userEntityRepository = userEntityRepository;
-
+        this.artistEntityRepository = artistEntityRepository;
+        this.categoryEntityRepository = categoryEntityRepository;
+        this.characterEntityRepository = characterEntityRepository;
+        this.groupEntityRepository = groupEntityRepository;
+        this.parodyEntityRepository = parodyEntityRepository;
+        this.tagEntityRepository = tagEntityRepository;
     }
 
     private Optional<UserEntity> getUser(Long id){
         return userEntityRepository.findById(id);
+    }
+    private Optional<ArtistEntity> getArtist(Long id){
+        return artistEntityRepository.findById(id);
+    }
+    private Optional<CategoryEntity> getCategory(Long id){
+        return categoryEntityRepository.findById(id);
+    }
+    private Optional<CharacterEntity> getCharacter(Long id){
+        return characterEntityRepository.findById(id);
+    }
+    private Optional<GroupEntity> getGroup(Long id){
+        return groupEntityRepository.findById(id);
+    }
+    private Optional<ParodyEntity> getParody(Long id){
+        return parodyEntityRepository.findById(id);
+    }
+    private Optional<TagEntity> getTag(Long id){
+        return tagEntityRepository.findById(id);
     }
 
     @Override
@@ -93,7 +122,6 @@ public class MangaServiceImpl implements MangaService{
             List<Category> categoryList = new ArrayList<>();
             List<Comment> commentList = new ArrayList<>();
             List<MangaUser> mangaUserList = new ArrayList<>();
-            List<PageModel> pageModelList = new ArrayList<>();
             List<Group> groupList = new ArrayList<>();
             List<Character> characterList = new ArrayList<>();
             List<Tag> tagList = new ArrayList<>();
@@ -153,15 +181,6 @@ public class MangaServiceImpl implements MangaService{
                     mangaUserList.add(mangaUser);
                 }
 
-                for (PageEntity a:mangaEntity.get().getPage()
-                ) {
-                    PageModel pageModel = new PageModel();
-                    pageModel.setId(a.getId());
-                    pageModel.setPageOrder(a.getPageOrder());
-                    pageModel.setFile(a.getFile());
-                    pageModelList.add(pageModel);
-                }
-
                 for (GroupEntity a:mangaEntity.get().getGroup()
                 ) {
                     Group group = new Group();
@@ -207,7 +226,6 @@ public class MangaServiceImpl implements MangaService{
                 manga.setCategory(categoryList);
                 manga.setComment(commentList);
                 manga.setMangaUser(mangaUserList);
-                manga.setPageModel(pageModelList);
                 manga.setGroup(groupList);
                 manga.setCharacter(characterList);
                 manga.setTag(tagList);
@@ -229,12 +247,127 @@ public class MangaServiceImpl implements MangaService{
 
         try {
             Optional<MangaEntity> fetchManga = mangaEntityRepository.findById(id);
+            List<ArtistEntity> artistEntities = new ArrayList<>();
+            List<CategoryEntity> categoryEntities = new ArrayList<>();
+            List<CharacterEntity> characterEntities = new ArrayList<>();
+            List<GroupEntity> groupEntities = new ArrayList<>();
+            List<ParodyEntity> parodyEntities = new ArrayList<>();
+            List<TagEntity> tagEntities = new ArrayList<>();
+
             fetchManga.ifPresent(mangaEntity -> {
                 Optional<UserEntity> fetchUser = getUser(mangaEntity.getCreatedBy().getId());
+
+                for (Artist a:mangaModel.getArtist()
+                     ) {
+                    Optional<ArtistEntity> fetchArtist = getArtist(a.getId());
+                    if (fetchArtist.isPresent()){
+                        ArtistEntity artistEntity = new ArtistEntity();
+                        artistEntity.setId(fetchArtist.get().getId());
+                        artistEntity.setName(fetchArtist.get().getName());
+                        artistEntities.add(artistEntity);
+                    }else{
+                        try {
+                            throw new Exception("no artist found!");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                for (Category a:mangaModel.getCategory()
+                ) {
+                    Optional<CategoryEntity> fetchCategory = getCategory(a.getId());
+                    if (fetchCategory.isPresent()){
+                        CategoryEntity categoryEntity = new CategoryEntity();
+                        categoryEntity.setId(fetchCategory.get().getId());
+                        categoryEntity.setName(fetchCategory.get().getName());
+                        categoryEntities.add(categoryEntity);
+                    }else{
+                        try {
+                            throw new Exception("no category found!");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                for (Character a:mangaModel.getCharacter()
+                ) {
+                    Optional<CharacterEntity> fetchCharacter = getCharacter(a.getId());
+                    if (fetchCharacter.isPresent()){
+                        CharacterEntity characterEntity = new CharacterEntity();
+                        characterEntity.setId(fetchCharacter.get().getId());
+                        characterEntity.setName(fetchCharacter.get().getName());
+                        characterEntities.add(characterEntity);
+                    }else{
+                        try {
+                            throw new Exception("no character found!");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                for (Group a:mangaModel.getGroup()
+                ) {
+                    Optional<GroupEntity> fetchGroup = getGroup(a.getId());
+                    if (fetchGroup.isPresent()){
+                        GroupEntity groupEntity = new GroupEntity();
+                        groupEntity.setId(fetchGroup.get().getId());
+                        groupEntity.setName(fetchGroup.get().getName());
+                        groupEntities.add(groupEntity);
+                    }else{
+                        try {
+                            throw new Exception("no group found!");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                for (Parody a:mangaModel.getParody()
+                ) {
+                    Optional<ParodyEntity> fetchParody = getParody(a.getId());
+                    if (fetchParody.isPresent()){
+                        ParodyEntity parodyEntity = new ParodyEntity();
+                        parodyEntity.setId(fetchParody.get().getId());
+                        parodyEntity.setName(fetchParody.get().getName());
+                        parodyEntities.add(parodyEntity);
+                    }else{
+                        try {
+                            throw new Exception("no parody found!");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+
+                for (Tag a:mangaModel.getTag()
+                ) {
+                    Optional<TagEntity> fetchTag = getTag(a.getId());
+                    if (fetchTag.isPresent()){
+                        TagEntity tagEntity = new TagEntity();
+                        tagEntity.setId(fetchTag.get().getId());
+                        tagEntity.setName(fetchTag.get().getName());
+                        tagEntities.add(tagEntity);
+                    }else{
+                        try {
+                            throw new Exception("no tag found!");
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
 
                 mangaEntity.setTitle(mangaModel.getTitle());
                 mangaEntity.setMangaOrder(mangaModel.getMangaOrder());
                 mangaEntity.setCreatedAt(mangaModel.getCreatedAt());
+                mangaEntity.setArtist(artistEntities);
+                mangaEntity.setCategory(categoryEntities);
+                mangaEntity.setCharacter(characterEntities);
+                mangaEntity.setParody(parodyEntities);
+                mangaEntity.setTag(tagEntities);
+                mangaEntity.setGroup(groupEntities);
                 if (fetchUser.isPresent()){
                     mangaEntity.setCreatedBy(fetchUser.get());
                 }else{
@@ -244,6 +377,7 @@ public class MangaServiceImpl implements MangaService{
                         throw new RuntimeException(e);
                     }
                 }
+
                 mangaEntityRepository.save(mangaEntity);
             });
 

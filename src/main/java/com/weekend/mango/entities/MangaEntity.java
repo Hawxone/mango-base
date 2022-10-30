@@ -43,12 +43,8 @@ public class MangaEntity {
     @OneToMany(cascade= CascadeType.ALL,mappedBy = "manga",fetch = FetchType.LAZY)
     private List<MangaUserEntity> mangaUser = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name ="manga_page",
-            joinColumns = @JoinColumn(name = "manga_id"),
-            inverseJoinColumns = @JoinColumn(name = "page_id"))
-    private List<PageEntity> page = new ArrayList<>();
+    @OneToMany(cascade= CascadeType.ALL,mappedBy = "mangaId",fetch = FetchType.LAZY)
+    private List<PageEntity> pageEntities = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

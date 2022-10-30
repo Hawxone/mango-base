@@ -7,8 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+
 
 @Entity
 @Table(name="pages")
@@ -18,16 +17,13 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class PageEntity {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotBlank
-    @Size(max = 120)
     private Integer pageOrder;
-
-    @NotBlank
-    @Size(max = 120)
     private String file;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="manga_id")
+    private MangaEntity mangaId;
 }
