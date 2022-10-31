@@ -14,7 +14,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/parody")
 public class ParodyController {
 
-    private ParodyService parodyService;
+    private final ParodyService parodyService;
 
 
     public ParodyController(ParodyService parodyService) {

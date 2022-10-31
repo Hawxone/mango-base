@@ -14,7 +14,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/character")
 public class CharacterController {
 
-    private CharacterService characterService;
+    private final CharacterService characterService;
 
     public CharacterController(CharacterService characterService) {
         this.characterService = characterService;

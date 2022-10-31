@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/usertag")
 public class UserTagController {
 
-    private UserTagService userTagService;
+    private final UserTagService userTagService;
 
     public UserTagController(UserTagService userTagService) {
         this.userTagService = userTagService;
@@ -63,5 +63,4 @@ public class UserTagController {
         response.put("deleted",deleted);
         return ResponseEntity.ok(response);
     }
-
 }

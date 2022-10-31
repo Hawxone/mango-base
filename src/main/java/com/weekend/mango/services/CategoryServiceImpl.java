@@ -12,7 +12,7 @@ import java.util.Optional;
 @Service
 public class CategoryServiceImpl implements CategoryService{
 
-    private CategoryEntityRepository categoryEntityRepository;
+    private final CategoryEntityRepository categoryEntityRepository;
 
     public CategoryServiceImpl(CategoryEntityRepository categoryEntityRepository) {
         this.categoryEntityRepository = categoryEntityRepository;
@@ -76,9 +76,7 @@ public class CategoryServiceImpl implements CategoryService{
         try {
             Optional<CategoryEntity> fetchCategory = categoryEntityRepository.findById(id);
 
-            fetchCategory.ifPresent(categoryEntity -> {
-                categoryEntityRepository.delete(categoryEntity);
-            });
+            fetchCategory.ifPresent(categoryEntityRepository::delete);
 
         }catch (Exception e){
             throw new Exception("can't delete entry "+e);

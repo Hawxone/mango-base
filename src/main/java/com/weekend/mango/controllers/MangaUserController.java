@@ -12,7 +12,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/mangauser")
 public class MangaUserController {
 
-    private MangaUserService mangaUserService;
+    private final MangaUserService mangaUserService;
 
     public MangaUserController(MangaUserService mangaUserService) {
         this.mangaUserService = mangaUserService;

@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/tag")
 public class TagController {
 
-    private TagService tagService;
+    private final TagService tagService;
 
     public TagController(TagService tagService) {
         this.tagService = tagService;

@@ -7,12 +7,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 public class ParodyServiceImpl implements ParodyService{
 
-    private ParodyEntityRepository parodyEntityRepository;
+    private final ParodyEntityRepository parodyEntityRepository;
 
     public ParodyServiceImpl(ParodyEntityRepository parodyEntityRepository) {
         this.parodyEntityRepository = parodyEntityRepository;
@@ -73,9 +73,7 @@ public class ParodyServiceImpl implements ParodyService{
         try {
             Optional<ParodyEntity> fetchParody = parodyEntityRepository.findById(id);
 
-            fetchParody.ifPresent(parodyEntity -> {
-                parodyEntityRepository.delete(parodyEntity);
-            });
+            fetchParody.ifPresent(parodyEntityRepository::delete);
 
         }catch (Exception e){
             throw new Exception("can't delete entry " + e);

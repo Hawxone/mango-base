@@ -15,7 +15,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/artist")
 public class ArtistController {
 
-    private ArtistService artistService;
+    private final ArtistService artistService;
 
     public ArtistController(ArtistService artistService) {
         this.artistService = artistService;

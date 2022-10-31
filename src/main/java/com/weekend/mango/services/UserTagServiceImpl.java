@@ -17,9 +17,9 @@ import java.util.Optional;
 @Service
 public class UserTagServiceImpl implements UserTagService{
 
-    private UserTagEntityRepository userTagEntityRepository;
-    private UserEntityRepository userEntityRepository;
-    private TagEntityRepository tagEntityRepository;
+    private final UserTagEntityRepository userTagEntityRepository;
+    private final UserEntityRepository userEntityRepository;
+    private final TagEntityRepository tagEntityRepository;
 
 
     public UserTagServiceImpl(UserTagEntityRepository userTagEntityRepository, UserEntityRepository userEntityRepository, TagEntityRepository tagEntityRepository) {

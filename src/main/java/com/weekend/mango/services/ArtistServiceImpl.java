@@ -11,7 +11,7 @@ import java.util.Optional;
 @Service
 public class ArtistServiceImpl implements ArtistService{
 
-    private ArtistEntityRepository artistEntityRepository;
+    private final ArtistEntityRepository artistEntityRepository;
 
     public ArtistServiceImpl(ArtistEntityRepository artistEntityRepository) {
         this.artistEntityRepository = artistEntityRepository;
@@ -76,9 +76,7 @@ public class ArtistServiceImpl implements ArtistService{
 
         try {
             Optional<ArtistEntity> checkArtist = artistEntityRepository.findById(id);
-            checkArtist.ifPresent(ArtistEntity->{
-                artistEntityRepository.delete(ArtistEntity);
-            });
+            checkArtist.ifPresent(artistEntityRepository::delete);
 
         }catch (Exception e){
             throw new Exception("cant delete entry "+e);

@@ -12,7 +12,7 @@ import java.util.Optional;
 @Service
 public class TagServiceImpl implements TagService{
 
-    private TagEntityRepository tagEntityRepository;
+    private final TagEntityRepository tagEntityRepository;
 
     public TagServiceImpl(TagEntityRepository tagEntityRepository) {
         this.tagEntityRepository = tagEntityRepository;
@@ -73,9 +73,7 @@ public class TagServiceImpl implements TagService{
 
         try {
             Optional<TagEntity> fetchTag = tagEntityRepository.findById(id);
-            fetchTag.ifPresent(tagEntity -> {
-                tagEntityRepository.delete(tagEntity);
-            });
+            fetchTag.ifPresent(tagEntityRepository::delete);
         }catch (Exception e){
             throw new Exception("can't delete entry " + e);
         }

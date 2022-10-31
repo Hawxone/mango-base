@@ -14,9 +14,9 @@ import java.util.Optional;
 @Service
 public class MangaUserServiceImpl implements MangaUserService{
 
-    private MangaUserEntityRepository mangaUserEntityRepository;
-    private MangaEntityRepository mangaEntityRepository;
-    private UserEntityRepository userEntityRepository;
+    private final MangaUserEntityRepository mangaUserEntityRepository;
+    private final MangaEntityRepository mangaEntityRepository;
+    private final UserEntityRepository userEntityRepository;
 
     public MangaUserServiceImpl(MangaUserEntityRepository mangaUserEntityRepository, MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository) {
         this.mangaUserEntityRepository = mangaUserEntityRepository;

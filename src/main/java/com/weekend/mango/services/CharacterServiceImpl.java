@@ -11,7 +11,7 @@ import java.util.Optional;
 @Service
 public class CharacterServiceImpl implements CharacterService{
 
-    private CharacterEntityRepository characterEntityRepository;
+    private final CharacterEntityRepository characterEntityRepository;
 
     public CharacterServiceImpl(CharacterEntityRepository characterEntityRepository) {
         this.characterEntityRepository = characterEntityRepository;
@@ -71,9 +71,7 @@ public class CharacterServiceImpl implements CharacterService{
 
         try {
             Optional<CharacterEntity> fetchCharacter = characterEntityRepository.findById(id);
-            fetchCharacter.ifPresent(characterEntity -> {
-                characterEntityRepository.delete(characterEntity);
-            });
+            fetchCharacter.ifPresent(characterEntityRepository::delete);
         }catch (Exception e){
             throw new Exception("can't delete entry " + e);
         }

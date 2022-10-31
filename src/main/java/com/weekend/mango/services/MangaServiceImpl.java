@@ -16,15 +16,15 @@ import java.util.*;
 @Service
 public class MangaServiceImpl implements MangaService{
 
-    private MangaEntityRepository mangaEntityRepository;
-    private UserEntityRepository userEntityRepository;
-    private ArtistEntityRepository artistEntityRepository;
-    private CategoryEntityRepository categoryEntityRepository;
-    private CharacterEntityRepository characterEntityRepository;
-    private GroupEntityRepository groupEntityRepository;
-    private ParodyEntityRepository parodyEntityRepository;
-    private TagEntityRepository tagEntityRepository;
-    private UserTagEntityRepository userTagEntityRepository;
+    private final MangaEntityRepository mangaEntityRepository;
+    private final UserEntityRepository userEntityRepository;
+    private final ArtistEntityRepository artistEntityRepository;
+    private final CategoryEntityRepository categoryEntityRepository;
+    private final CharacterEntityRepository characterEntityRepository;
+    private final GroupEntityRepository groupEntityRepository;
+    private final ParodyEntityRepository parodyEntityRepository;
+    private final TagEntityRepository tagEntityRepository;
+    private final UserTagEntityRepository userTagEntityRepository;
 
 
     public MangaServiceImpl(MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository, ArtistEntityRepository artistEntityRepository, CategoryEntityRepository categoryEntityRepository, CharacterEntityRepository characterEntityRepository, GroupEntityRepository groupEntityRepository, ParodyEntityRepository parodyEntityRepository, TagEntityRepository tagEntityRepository, UserTagEntityRepository userTagEntityRepository) {
@@ -60,8 +60,6 @@ public class MangaServiceImpl implements MangaService{
     private Optional<TagEntity> getTag(Long id){
         return tagEntityRepository.findById(id);
     }
-
-
 
     @Override
     public Map<String, Object> getPaginatedMangaList(int page, int size, Long userId) {
@@ -417,7 +415,7 @@ public class MangaServiceImpl implements MangaService{
     public boolean deleteManga(Long id) throws Exception {
         try {
             Optional<MangaEntity> fetchManga = mangaEntityRepository.findById(id);
-            fetchManga.ifPresent(mangaEntity -> mangaEntityRepository.delete(mangaEntity));
+            fetchManga.ifPresent(mangaEntityRepository::delete);
         }catch (Exception e){
             throw new Exception("can't delete entry" + e);
         }

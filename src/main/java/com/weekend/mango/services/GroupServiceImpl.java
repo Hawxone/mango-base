@@ -5,15 +5,14 @@ import com.weekend.mango.models.Group;
 import com.weekend.mango.repositories.GroupEntityRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 @Service
 public class GroupServiceImpl implements GroupService{
 
-    private GroupEntityRepository groupEntityRepository;
+    private final GroupEntityRepository groupEntityRepository;
 
     public GroupServiceImpl(GroupEntityRepository groupEntityRepository) {
         this.groupEntityRepository = groupEntityRepository;
@@ -75,9 +74,7 @@ public class GroupServiceImpl implements GroupService{
         try {
             Optional<GroupEntity> fetchGroup = groupEntityRepository.findById(id);
 
-            fetchGroup.ifPresent(groupEntity -> {
-                groupEntityRepository.delete(groupEntity);
-            });
+            fetchGroup.ifPresent(groupEntityRepository::delete);
 
         }catch (Exception e){
             throw new Exception("can't delete entry " + e);

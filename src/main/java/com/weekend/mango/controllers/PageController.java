@@ -20,9 +20,9 @@ import java.util.Optional;
 @RequestMapping("/api/v1/manga")
 public class PageController {
 
-    private PageService pageService;
-    private MangaEntityRepository mangaEntityRepository;
-    private PageEntityRepository pageEntityRepository;
+    private final PageService pageService;
+    private final MangaEntityRepository mangaEntityRepository;
+    private final PageEntityRepository pageEntityRepository;
 
     public PageController(PageService pageService, MangaEntityRepository mangaEntityRepository, PageEntityRepository pageEntityRepository) {
         this.pageService = pageService;

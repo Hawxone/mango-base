@@ -19,8 +19,8 @@ import java.util.*;
 @RequestMapping("/api/v1/manga")
 public class MangaController {
 
-    private MangaService mangaService;
-    private UserEntityRepository userEntityRepository;
+    private final MangaService mangaService;
+    private final UserEntityRepository userEntityRepository;
 
 
     public MangaController(MangaService mangaService, UserEntityRepository userEntityRepository) {

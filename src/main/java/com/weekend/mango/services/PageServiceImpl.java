@@ -14,8 +14,8 @@ import java.util.Optional;
 @Service
 public class PageServiceImpl implements PageService {
 
-    private MangaEntityRepository mangaEntityRepository;
-    private PageEntityRepository pageEntityRepository;
+    private final MangaEntityRepository mangaEntityRepository;
+    private final PageEntityRepository pageEntityRepository;
 
     public PageServiceImpl(MangaEntityRepository mangaEntityRepository, PageEntityRepository pageEntityRepository) {
         this.mangaEntityRepository = mangaEntityRepository;
@@ -89,7 +89,7 @@ public class PageServiceImpl implements PageService {
             Optional<MangaEntity> fetchManga =getManga(mangaId);
             if (fetchManga.isPresent()){
                 Optional<PageEntity> fetchPage = pageEntityRepository.findPageEntityByIdAndMangaId(id,fetchManga.get());
-                fetchPage.ifPresent(pageEntity -> pageEntityRepository.delete(pageEntity));
+                fetchPage.ifPresent(pageEntityRepository::delete);
             }else {
                 throw new Exception("manga not found!");
             }
