@@ -52,7 +52,12 @@ public class UserEntity {
     private List<MangaUserEntity> mangaUser = new ArrayList<>();
 
     @OneToMany(cascade= CascadeType.ALL,mappedBy = "user",fetch = FetchType.LAZY)
+    private List<UserTagEntity> userTag = new ArrayList<>();
+
+    @OneToMany(cascade= CascadeType.ALL,mappedBy = "user",fetch = FetchType.LAZY)
     private List<CommentEntity> comment = new ArrayList<>();
+
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -61,12 +66,7 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<RoleEntity> roles =new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name ="user_tag",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<TagEntity> tag = new ArrayList<>();
+
 
 
 

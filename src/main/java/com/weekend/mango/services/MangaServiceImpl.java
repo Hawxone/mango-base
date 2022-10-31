@@ -24,9 +24,10 @@ public class MangaServiceImpl implements MangaService{
     private GroupEntityRepository groupEntityRepository;
     private ParodyEntityRepository parodyEntityRepository;
     private TagEntityRepository tagEntityRepository;
+    private UserTagEntityRepository userTagEntityRepository;
 
 
-    public MangaServiceImpl(MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository, ArtistEntityRepository artistEntityRepository, CategoryEntityRepository categoryEntityRepository, CharacterEntityRepository characterEntityRepository, GroupEntityRepository groupEntityRepository, ParodyEntityRepository parodyEntityRepository, TagEntityRepository tagEntityRepository) {
+    public MangaServiceImpl(MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository, ArtistEntityRepository artistEntityRepository, CategoryEntityRepository categoryEntityRepository, CharacterEntityRepository characterEntityRepository, GroupEntityRepository groupEntityRepository, ParodyEntityRepository parodyEntityRepository, TagEntityRepository tagEntityRepository, UserTagEntityRepository userTagEntityRepository) {
         this.mangaEntityRepository = mangaEntityRepository;
         this.userEntityRepository = userEntityRepository;
         this.artistEntityRepository = artistEntityRepository;
@@ -35,6 +36,7 @@ public class MangaServiceImpl implements MangaService{
         this.groupEntityRepository = groupEntityRepository;
         this.parodyEntityRepository = parodyEntityRepository;
         this.tagEntityRepository = tagEntityRepository;
+        this.userTagEntityRepository = userTagEntityRepository;
     }
 
     private Optional<UserEntity> getUser(Long id){
@@ -59,19 +61,41 @@ public class MangaServiceImpl implements MangaService{
         return tagEntityRepository.findById(id);
     }
 
-    @Override
-    public Map<String, Object> getPaginatedMangaList(int page, int size) {
 
+
+    @Override
+    public Map<String, Object> getPaginatedMangaList(int page, int size, Long userId) {
+        List<MangaList>mangaLists =new ArrayList<>();
+        List<UserTag> userTags = new ArrayList<>();
         Pageable paging = PageRequest.of(page,size);
 
         Page<MangaEntity> mangaEntities = mangaEntityRepository.findAll(paging);
 
-        List<MangaList>mangaLists = mangaEntities.stream().map((mangaEntity) ->
-                MangaList.builder()
-                        .id(mangaEntity.getId())
-                        .title(mangaEntity.getTitle())
-                        .build()
-        ).toList();
+        for (MangaEntity a:mangaEntities
+             ) {
+            MangaList mangaList = new MangaList();
+            mangaList.setId(a.getId());
+            mangaList.setTitle(a.getTitle());
+
+            Optional<UserEntity> fetchUser = getUser(userId);
+
+            if (fetchUser.isPresent()){
+                for (TagEntity b:a.getTag()
+                     ) {
+                    Optional<UserTagEntity> fetchUserTag = userTagEntityRepository.findUserTagEntityByUser_IdAndTag_Id(fetchUser.get().getId(), b.getId());
+                    if (fetchUserTag.isPresent()){
+                       if (fetchUserTag.get().getTag().getId().equals(b.getId())){
+                           UserTag userTag = new UserTag();
+                           userTag.setIsFavorite(fetchUserTag.get().getIsLike());
+                           userTags.add(userTag);
+                           mangaList.setUserTag(userTags);
+                       }
+                    }
+                }
+            }
+
+            mangaLists.add(mangaList);
+        }
 
         Map<String,Object> response = new HashMap<>();
         response.put("mangaList",mangaLists);

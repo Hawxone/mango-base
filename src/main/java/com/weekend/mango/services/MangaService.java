@@ -5,7 +5,7 @@ import com.weekend.mango.models.Manga;
 import java.util.Map;
 
 public interface MangaService {
-    Map<String, Object> getPaginatedMangaList(int page, int size);
+    Map<String, Object> getPaginatedMangaList(int page, int size, Long userId);
 
     Manga createManga(Manga mangaModel) throws Exception;
 

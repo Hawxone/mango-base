@@ -28,6 +28,9 @@ public class TagEntity {
     @Size(max = 120)
     private String name;
 
+    @OneToMany(cascade= CascadeType.ALL,mappedBy = "tag",fetch = FetchType.LAZY)
+    private List<UserTagEntity> userTag = new ArrayList<>();
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name ="manga_tag",

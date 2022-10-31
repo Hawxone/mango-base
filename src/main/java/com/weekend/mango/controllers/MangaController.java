@@ -30,9 +30,9 @@ public class MangaController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String,Object>> getMangas(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size){
+    public ResponseEntity<Map<String,Object>> getMangas(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size,@RequestParam(defaultValue = "0") Long userId){
 
-        Map<String, Object> mangaList =mangaService.getPaginatedMangaList(page,size);
+        Map<String, Object> mangaList =mangaService.getPaginatedMangaList(page,size,userId);
 
         return ResponseEntity.ok(mangaList);
     }

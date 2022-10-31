@@ -4,4 +4,8 @@ import com.weekend.mango.models.MangaUser;
 
 public interface MangaUserService {
     MangaUser getMangaUserByMangaAndUser(Long mangaId, Long userId) throws Exception;
+
+    MangaUser createMangaUser(MangaUser mangaUserModel) throws Exception;
+
+    MangaUser updateMangaUser(MangaUser mangaUserModel) throws Exception;
 }

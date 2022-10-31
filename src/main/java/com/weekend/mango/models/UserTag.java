@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MangaUser {
+public class UserTag {
+
     Long id;
-    Long MangaId;
-    Long UserId;
-    Boolean isWillRead;
+    Long userId;
+    Long tagId;
+    String tagName;
     Boolean isFavorite;
-    Integer currentPage;
 }

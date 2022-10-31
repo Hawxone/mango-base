@@ -24,12 +24,20 @@ public class MangaUserServiceImpl implements MangaUserService{
         this.userEntityRepository = userEntityRepository;
     }
 
+    Optional<MangaEntity> getManga(Long id){
+        return mangaEntityRepository.findById(id);
+    }
+
+    Optional<UserEntity> getUser(Long id){
+        return userEntityRepository.findById(id);
+    }
+
     @Override
     public MangaUser getMangaUserByMangaAndUser(Long mangaId, Long userId) throws Exception {
 
-        Optional<MangaEntity> fetchManga = mangaEntityRepository.findById(mangaId);
+        Optional<MangaEntity> fetchManga = getManga(mangaId);
         if (fetchManga.isPresent()){
-            Optional<UserEntity>fetchUser = userEntityRepository.findById(userId);
+            Optional<UserEntity>fetchUser = getUser(userId);
             if (fetchUser.isPresent()){
                 Optional<MangaUserEntity> fetchMangaUser = mangaUserEntityRepository.getMangaUserEntityByUserIdAndManga_Id(userId,mangaId);
                 if (fetchMangaUser.isPresent()){
@@ -38,6 +46,8 @@ public class MangaUserServiceImpl implements MangaUserService{
                     mangaUser.setIsFavorite(fetchMangaUser.get().getIsFavorite());
                     mangaUser.setCurrentPage(fetchMangaUser.get().getCurrentPage());
                     mangaUser.setIsWillRead(fetchMangaUser.get().getIsWillRead());
+                    mangaUser.setUserId(userId);
+                    mangaUser.setMangaId(mangaId);
 
                     return mangaUser;
                 }
@@ -46,5 +56,72 @@ public class MangaUserServiceImpl implements MangaUserService{
             throw new Exception("manga not found!");
         }
         return null;
+    }
+
+    @Override
+    public MangaUser createMangaUser(MangaUser mangaUserModel) throws Exception {
+
+        try {
+            Optional<MangaUserEntity> fetchMangaUser = mangaUserEntityRepository.getMangaUserEntityByUserIdAndManga_Id(mangaUserModel.getUserId(), mangaUserModel.getMangaId());
+
+            if (fetchMangaUser.isPresent()){
+                return null;
+            }else {
+                MangaUserEntity mangaUserEntity = new MangaUserEntity();
+                    if (getManga(mangaUserModel.getMangaId()).isPresent()){
+                        mangaUserEntity.setManga(getManga(mangaUserModel.getMangaId()).get());
+                    }else {
+                        throw new Exception("Manga not found!");
+                    }
+                    if (getUser(mangaUserModel.getUserId()).isPresent()){
+                        mangaUserEntity.setUser(getUser(mangaUserModel.getUserId()).get());
+                    }else {
+                        throw new Exception("user not found!");
+                    }
+                    mangaUserEntity.setCurrentPage(mangaUserModel.getCurrentPage());
+                    mangaUserEntity.setIsFavorite(mangaUserModel.getIsFavorite());
+                    mangaUserEntity.setIsWillRead(mangaUserEntity.getIsWillRead());
+
+                    mangaUserEntityRepository.save(mangaUserEntity);
+                    mangaUserModel.setId(mangaUserEntity.getId());
+                    return mangaUserModel;
+            }
+        }catch (Exception e){
+            throw new Exception("can't save entry " + e);
+        }
+    }
+
+    @Override
+    public MangaUser updateMangaUser(MangaUser mangaUserModel) throws Exception {
+
+        try {
+            Optional<MangaUserEntity> fetchMangaUser = mangaUserEntityRepository.getMangaUserEntityByUserIdAndManga_Id(mangaUserModel.getUserId(), mangaUserModel.getUserId());
+
+            if (fetchMangaUser.isPresent()){
+                MangaUserEntity mangaUserEntity = fetchMangaUser.get();
+
+                if (getManga(mangaUserModel.getMangaId()).isPresent()){
+                    mangaUserEntity.setManga(getManga(mangaUserModel.getMangaId()).get());
+                }else {
+                    throw new Exception("Manga not found!");
+                }
+                if (getUser(mangaUserModel.getUserId()).isPresent()){
+                    mangaUserEntity.setUser(getUser(mangaUserModel.getUserId()).get());
+                }else {
+                    throw new Exception("user not found!");
+                }
+                mangaUserEntity.setCurrentPage(mangaUserModel.getCurrentPage());
+                mangaUserEntity.setIsFavorite(mangaUserModel.getIsFavorite());
+                mangaUserEntity.setIsWillRead(mangaUserEntity.getIsWillRead());
+
+                mangaUserEntityRepository.save(mangaUserEntity);
+                return mangaUserModel;
+            }else {
+                throw new Exception("no manga user!");
+            }
+        }catch (Exception e){
+            throw new Exception("can't update entry " + e);
+        }
+
     }
 }
