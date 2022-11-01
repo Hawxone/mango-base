@@ -4,9 +4,11 @@ import com.weekend.mango.entities.*;
 import com.weekend.mango.models.*;
 import com.weekend.mango.models.Character;
 import com.weekend.mango.repositories.*;
+import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
@@ -102,6 +104,59 @@ public class MangaServiceImpl implements MangaService{
         response.put("totalPages",mangaEntities.getTotalPages());
 
         return response;
+    }
+
+    @Override
+    public Map<String, Object> getPaginatedMangaListByUser(int page, int size, Long userId) {
+        List<MangaList>mangaLists =new ArrayList<>();
+
+        Pageable paging = PageRequest.of(page,size);
+        Page<MangaEntity> mangaEntities = mangaEntityRepository.findMangaEntitiesByCreatedBy_Id(userId,paging);
+
+        for (MangaEntity a:mangaEntities
+        ) {
+            MangaList mangaList = new MangaList();
+            mangaList.setId(a.getId());
+            mangaList.setTitle(a.getTitle());
+
+
+            mangaLists.add(mangaList);
+        }
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("mangaList",mangaLists);
+        response.put("currentPage",mangaEntities.getNumber());
+        response.put("totalItems",mangaEntities.getTotalElements());
+        response.put("totalPages",mangaEntities.getTotalPages());
+
+        return response;
+    }
+
+    @Override
+    public boolean publishManga(Long id) throws Exception {
+
+        try {
+            Optional<MangaEntity> fetchManga = mangaEntityRepository.findById(id);
+            if (fetchManga.isPresent()){
+                MangaEntity mangaEntity = fetchManga.get();
+                mangaEntity.setUploadDate(DateTime.now());
+                Optional<List<MangaEntity>> order = mangaEntityRepository.findAllByMangaOrderNotNull(Sort.by("mangaOrder").descending());
+                if (order.isPresent()){
+                    if (order.get().size() == 0){
+                        mangaEntity.setMangaOrder(1);
+                    }else{
+                        mangaEntity.setMangaOrder(order.get().get(0).getMangaOrder()+1);
+                    }
+                }
+
+                mangaEntityRepository.save(mangaEntity);
+            }
+        }catch (Exception e){
+            throw new Exception("can't publish entry " + e);
+        }
+
+
+        return true;
     }
 
     @Override
@@ -387,13 +442,14 @@ public class MangaServiceImpl implements MangaService{
 
                 mangaEntity.setTitle(mangaModel.getTitle());
                 mangaEntity.setMangaOrder(mangaModel.getMangaOrder());
-                mangaEntity.setCreatedAt(mangaModel.getCreatedAt());
+                mangaEntity.setUploadDate(mangaModel.getUploadDate());
                 mangaEntity.setArtist(artistEntities);
                 mangaEntity.setCategory(categoryEntities);
                 mangaEntity.setCharacter(characterEntities);
                 mangaEntity.setParody(parodyEntities);
                 mangaEntity.setTag(tagEntities);
                 mangaEntity.setGroup(groupEntities);
+
                 if (fetchUser.isPresent()){
                     mangaEntity.setCreatedBy(fetchUser.get());
                 }else{
@@ -426,4 +482,6 @@ public class MangaServiceImpl implements MangaService{
 
         return true;
     }
+
+
 }

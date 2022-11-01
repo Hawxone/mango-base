@@ -14,4 +14,8 @@ public interface MangaService {
     Manga saveManga(Long id,Manga mangaModel) throws Exception;
 
     boolean deleteManga(Long id) throws Exception;
+
+    Map<String, Object> getPaginatedMangaListByUser(int page, int size, Long userId);
+
+    boolean publishManga(Long id) throws Exception;
 }

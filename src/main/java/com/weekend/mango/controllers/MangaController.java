@@ -37,6 +37,14 @@ public class MangaController {
         return ResponseEntity.ok(mangaList);
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Map<String,Object>> getMangasByUserId(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size,@PathVariable Long userId){
+
+        Map<String, Object> mangaList =mangaService.getPaginatedMangaListByUser(page,size,userId);
+
+        return ResponseEntity.ok(mangaList);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Manga> getMangaById(@PathVariable Long id, @RequestParam(defaultValue = "0") Long userId) throws Exception{
 
@@ -238,6 +246,17 @@ public class MangaController {
 
 
         return ResponseEntity.ok(mangaModel);
+    }
+
+    @PutMapping("/{id}/publish")
+    public ResponseEntity<Map<String,Boolean>> publishManga(@PathVariable Long id) throws Exception {
+
+        boolean published;
+        published = mangaService.publishManga(id);
+        Map<String,Boolean> response = new HashMap<>();
+        response.put("published",published);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
