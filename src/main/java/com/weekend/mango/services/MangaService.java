@@ -18,4 +18,6 @@ public interface MangaService {
     Map<String, Object> getPaginatedMangaListByUser(int page, int size, Long userId);
 
     boolean publishManga(Long id) throws Exception;
+
+    Manga getMangaByOrderId(Integer id, Long userId) throws Exception;
 }

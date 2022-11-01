@@ -53,6 +53,14 @@ public class MangaController {
         return ResponseEntity.ok(mangaDetail);
     }
 
+    @GetMapping("/order/{id}")
+    public ResponseEntity<Manga> getMangaByOrderId(@PathVariable Integer id, @RequestParam(defaultValue = "0") Long userId) throws Exception{
+
+        Manga mangaDetail = mangaService.getMangaByOrderId(id,userId);
+
+        return ResponseEntity.ok(mangaDetail);
+    }
+
     @PostMapping
     public ResponseEntity<Manga> createManga(@RequestParam Map<String,String> requests) throws Exception {
 

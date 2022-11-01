@@ -63,135 +63,9 @@ public class MangaServiceImpl implements MangaService{
         return tagEntityRepository.findById(id);
     }
 
-    @Override
-    public Map<String, Object> getPaginatedMangaList(int page, int size, Long userId) {
-        List<MangaList>mangaLists =new ArrayList<>();
-        List<UserTag> userTags = new ArrayList<>();
-        Pageable paging = PageRequest.of(page,size);
-
-        Page<MangaEntity> mangaEntities = mangaEntityRepository.findAll(paging);
-
-        for (MangaEntity a:mangaEntities
-             ) {
-            MangaList mangaList = new MangaList();
-            mangaList.setId(a.getId());
-            mangaList.setTitle(a.getTitle());
-
-            Optional<UserEntity> fetchUser = getUser(userId);
-
-            if (fetchUser.isPresent()){
-                for (TagEntity b:a.getTag()
-                     ) {
-                    Optional<UserTagEntity> fetchUserTag = userTagEntityRepository.findUserTagEntityByUser_IdAndTag_Id(fetchUser.get().getId(), b.getId());
-                    if (fetchUserTag.isPresent()){
-                       if (fetchUserTag.get().getTag().getId().equals(b.getId())){
-                           UserTag userTag = new UserTag();
-                           userTag.setIsFavorite(fetchUserTag.get().getIsLike());
-                           userTags.add(userTag);
-                           mangaList.setUserTag(userTags);
-                       }
-                    }
-                }
-            }
-
-            mangaLists.add(mangaList);
-        }
-
-        Map<String,Object> response = new HashMap<>();
-        response.put("mangaList",mangaLists);
-        response.put("currentPage",mangaEntities.getNumber());
-        response.put("totalItems",mangaEntities.getTotalElements());
-        response.put("totalPages",mangaEntities.getTotalPages());
-
-        return response;
-    }
-
-    @Override
-    public Map<String, Object> getPaginatedMangaListByUser(int page, int size, Long userId) {
-        List<MangaList>mangaLists =new ArrayList<>();
-
-        Pageable paging = PageRequest.of(page,size);
-        Page<MangaEntity> mangaEntities = mangaEntityRepository.findMangaEntitiesByCreatedBy_Id(userId,paging);
-
-        for (MangaEntity a:mangaEntities
-        ) {
-            MangaList mangaList = new MangaList();
-            mangaList.setId(a.getId());
-            mangaList.setTitle(a.getTitle());
-
-
-            mangaLists.add(mangaList);
-        }
-
-        Map<String,Object> response = new HashMap<>();
-        response.put("mangaList",mangaLists);
-        response.put("currentPage",mangaEntities.getNumber());
-        response.put("totalItems",mangaEntities.getTotalElements());
-        response.put("totalPages",mangaEntities.getTotalPages());
-
-        return response;
-    }
-
-    @Override
-    public boolean publishManga(Long id) throws Exception {
+    private Manga getManga(Optional<MangaEntity> mangaEntity,Long userId) throws Exception {
 
         try {
-            Optional<MangaEntity> fetchManga = mangaEntityRepository.findById(id);
-            if (fetchManga.isPresent()){
-                MangaEntity mangaEntity = fetchManga.get();
-                mangaEntity.setUploadDate(DateTime.now());
-                Optional<List<MangaEntity>> order = mangaEntityRepository.findAllByMangaOrderNotNull(Sort.by("mangaOrder").descending());
-                if (order.isPresent()){
-                    if (order.get().size() == 0){
-                        mangaEntity.setMangaOrder(1);
-                    }else{
-                        mangaEntity.setMangaOrder(order.get().get(0).getMangaOrder()+1);
-                    }
-                }
-
-                mangaEntityRepository.save(mangaEntity);
-            }
-        }catch (Exception e){
-            throw new Exception("can't publish entry " + e);
-        }
-
-
-        return true;
-    }
-
-    @Override
-    public Manga createManga(Manga mangaModel) throws Exception {
-
-        MangaEntity mangaEntity = new MangaEntity();
-
-        Optional<UserEntity> user = getUser(mangaModel.getCreatedBy().getId());
-
-        if (user.isPresent()){
-            try {
-                mangaEntity.setTitle(mangaModel.getTitle());
-                mangaEntity.setCreatedAt(mangaModel.getCreatedAt());
-                mangaEntity.setCreatedBy(user.get());
-
-                mangaEntityRepository.save(mangaEntity);
-
-                mangaModel.setId(mangaEntity.getId());
-
-            }catch (Exception e){
-                throw new Exception("can't save entry " + e);
-            }
-        }else {
-            throw new Exception("user not found");
-        }
-
-
-        return mangaModel;
-    }
-
-    @Override
-    public Manga getMangaById(Long id, Long userId) throws Exception {
-
-        try {
-            Optional<MangaEntity> mangaEntity = mangaEntityRepository.findById(id);
 
             UserModel userModel = new UserModel();
 
@@ -320,6 +194,153 @@ public class MangaServiceImpl implements MangaService{
         }catch (Exception e){
             throw new Exception("can't find entry" + e);
         }
+
+    }
+
+    @Override
+    public Map<String, Object> getPaginatedMangaList(int page, int size, Long userId) {
+        List<MangaList>mangaLists =new ArrayList<>();
+        List<UserTag> userTags = new ArrayList<>();
+        Pageable paging = PageRequest.of(page,size);
+
+        Page<MangaEntity> mangaEntities = mangaEntityRepository.findAll(paging);
+
+        for (MangaEntity a:mangaEntities
+             ) {
+            MangaList mangaList = new MangaList();
+            mangaList.setId(a.getId());
+            mangaList.setTitle(a.getTitle());
+
+            Optional<UserEntity> fetchUser = getUser(userId);
+
+            if (fetchUser.isPresent()){
+                for (TagEntity b:a.getTag()
+                     ) {
+                    Optional<UserTagEntity> fetchUserTag = userTagEntityRepository.findUserTagEntityByUser_IdAndTag_Id(fetchUser.get().getId(), b.getId());
+                    if (fetchUserTag.isPresent()){
+                       if (fetchUserTag.get().getTag().getId().equals(b.getId())){
+                           UserTag userTag = new UserTag();
+                           userTag.setIsFavorite(fetchUserTag.get().getIsLike());
+                           userTags.add(userTag);
+                           mangaList.setUserTag(userTags);
+                       }
+                    }
+                }
+            }
+
+            mangaLists.add(mangaList);
+        }
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("mangaList",mangaLists);
+        response.put("currentPage",mangaEntities.getNumber());
+        response.put("totalItems",mangaEntities.getTotalElements());
+        response.put("totalPages",mangaEntities.getTotalPages());
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> getPaginatedMangaListByUser(int page, int size, Long userId) {
+        List<MangaList>mangaLists =new ArrayList<>();
+
+        Pageable paging = PageRequest.of(page,size);
+        Page<MangaEntity> mangaEntities = mangaEntityRepository.findMangaEntitiesByCreatedBy_Id(userId,paging);
+
+        for (MangaEntity a:mangaEntities
+        ) {
+            MangaList mangaList = new MangaList();
+            mangaList.setId(a.getId());
+            mangaList.setTitle(a.getTitle());
+
+
+            mangaLists.add(mangaList);
+        }
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("mangaList",mangaLists);
+        response.put("currentPage",mangaEntities.getNumber());
+        response.put("totalItems",mangaEntities.getTotalElements());
+        response.put("totalPages",mangaEntities.getTotalPages());
+
+        return response;
+    }
+
+    @Override
+    public boolean publishManga(Long id) throws Exception {
+
+        try {
+            Optional<MangaEntity> fetchManga = mangaEntityRepository.findById(id);
+            if (fetchManga.isPresent()){
+                MangaEntity mangaEntity = fetchManga.get();
+                mangaEntity.setUploadDate(DateTime.now());
+                Optional<List<MangaEntity>> order = mangaEntityRepository.findAllByMangaOrderNotNull(Sort.by("mangaOrder").descending());
+                if (order.isPresent()){
+                    if (order.get().size() == 0){
+                        mangaEntity.setMangaOrder(1);
+                    }else{
+                        mangaEntity.setMangaOrder(order.get().get(0).getMangaOrder()+1);
+                    }
+                }
+
+                mangaEntityRepository.save(mangaEntity);
+            }
+        }catch (Exception e){
+            throw new Exception("can't publish entry " + e);
+        }
+
+
+        return true;
+    }
+
+
+
+    @Override
+    public Manga createManga(Manga mangaModel) throws Exception {
+
+        MangaEntity mangaEntity = new MangaEntity();
+
+        Optional<UserEntity> user = getUser(mangaModel.getCreatedBy().getId());
+
+        if (user.isPresent()){
+            try {
+                mangaEntity.setTitle(mangaModel.getTitle());
+                mangaEntity.setCreatedAt(mangaModel.getCreatedAt());
+                mangaEntity.setCreatedBy(user.get());
+
+                mangaEntityRepository.save(mangaEntity);
+
+                mangaModel.setId(mangaEntity.getId());
+
+            }catch (Exception e){
+                throw new Exception("can't save entry " + e);
+            }
+        }else {
+            throw new Exception("user not found");
+        }
+
+
+        return mangaModel;
+    }
+
+    @Override
+    public Manga getMangaByOrderId(Integer id, Long userId) throws Exception {
+
+        Optional<MangaEntity> mangaEntity = mangaEntityRepository.findMangaEntitiesByMangaOrder(id);
+
+        Manga manga;
+        manga = getManga(mangaEntity,userId);
+
+        return manga;
+    }
+
+    @Override
+    public Manga getMangaById(Long id, Long userId) throws Exception {
+        Optional<MangaEntity> mangaEntity = mangaEntityRepository.findById(id);
+        Manga manga;
+        manga = getManga(mangaEntity,userId);
+
+        return manga;
 
     }
 

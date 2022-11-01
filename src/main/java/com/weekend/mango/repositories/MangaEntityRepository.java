@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface MangaEntityRepository extends JpaRepository<MangaEntity,Long> {
 
-    List<MangaEntity> findMangaEntitiesByMangaOrder(Integer order);
+    Optional<MangaEntity> findMangaEntitiesByMangaOrder(Integer order);
     Page<MangaEntity> findMangaEntitiesByCreatedBy_Id(Long id, Pageable pageable);
 
     Optional<List<MangaEntity>> findAllByMangaOrderNotNull(Sort mangaOrder);
