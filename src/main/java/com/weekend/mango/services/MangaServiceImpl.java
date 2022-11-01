@@ -133,7 +133,7 @@ public class MangaServiceImpl implements MangaService{
     }
 
     @Override
-    public Manga getMangaById(Long id) throws Exception {
+    public Manga getMangaById(Long id, Long userId) throws Exception {
 
         try {
             Optional<MangaEntity> mangaEntity = mangaEntityRepository.findById(id);
@@ -152,15 +152,26 @@ public class MangaServiceImpl implements MangaService{
 
             if (mangaEntity.isPresent()){
                 Optional<UserEntity> user = getUser(mangaEntity.get().getCreatedBy().getId());
+                Optional<UserEntity> checkUser = getUser(userId);
 
                 if (user.isPresent()){
                     userModel.setUsername(user.get().getUsername());
                     userModel.setImageUrl(user.get().getImageUrl());
                     userModel.setId(user.get().getId());
-
-
                 }else {
                     throw new Exception("no user found");
+                }
+
+                if (checkUser.isPresent()){
+                    for (MangaUserEntity a:mangaEntity.get().getMangaUser()
+                    ) {
+                        MangaUser mangaUser = new MangaUser();
+                        mangaUser.setId(a.getId());
+                        mangaUser.setCurrentPage(a.getCurrentPage());
+                        mangaUser.setIsFavorite(a.getIsFavorite());
+                        mangaUser.setIsWillRead(a.getIsWillRead());
+                        mangaUserList.add(mangaUser);
+                    }
                 }
 
                 for (ArtistEntity a:mangaEntity.get().getArtist()
@@ -188,20 +199,13 @@ public class MangaServiceImpl implements MangaService{
 
                     Comment comment = new Comment();
                     comment.setId(a.getId());
+                    comment.setCreatedAt(a.getCreatedAt());
                     comment.setComment(a.getComment());
                     comment.setUser(commentUserModel);
                     commentList.add(comment);
                 }
 
-                for (MangaUserEntity a:mangaEntity.get().getMangaUser()
-                ) {
-                    MangaUser mangaUser = new MangaUser();
-                    mangaUser.setId(a.getId());
-                    mangaUser.setCurrentPage(a.getCurrentPage());
-                    mangaUser.setIsFavorite(a.getIsFavorite());
-                    mangaUser.setIsWillRead(a.getIsWillRead());
-                    mangaUserList.add(mangaUser);
-                }
+
 
                 for (GroupEntity a:mangaEntity.get().getGroup()
                 ) {

@@ -38,9 +38,9 @@ public class MangaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Manga> getMangaById(@PathVariable Long id) throws Exception{
+    public ResponseEntity<Manga> getMangaById(@PathVariable Long id, @RequestParam(defaultValue = "0") Long userId) throws Exception{
 
-        Manga mangaDetail = mangaService.getMangaById(id);
+        Manga mangaDetail = mangaService.getMangaById(id,userId);
 
         return ResponseEntity.ok(mangaDetail);
     }
@@ -79,8 +79,6 @@ public class MangaController {
         }catch (Exception e){
             throw new Exception("can't save entry " + e);
         }
-
-
 
     }
 

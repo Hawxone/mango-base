@@ -43,6 +43,9 @@ public class MangaEntity {
     @OneToMany(cascade= CascadeType.ALL,mappedBy = "manga",fetch = FetchType.LAZY)
     private List<MangaUserEntity> mangaUser = new ArrayList<>();
 
+    @OneToMany(cascade= CascadeType.ALL,mappedBy = "manga",fetch = FetchType.LAZY)
+    private List<CommentEntity> comment = new ArrayList<>();
+
     @OneToMany(cascade= CascadeType.ALL,mappedBy = "mangaId",fetch = FetchType.LAZY)
     private List<PageEntity> pageEntities = new ArrayList<>();
 
@@ -88,11 +91,6 @@ public class MangaEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<TagEntity> tag = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name ="manga_comment",
-            joinColumns = @JoinColumn(name = "manga_id"),
-            inverseJoinColumns = @JoinColumn(name = "comment_id"))
-    private List<CommentEntity> comment = new ArrayList<>();
+
 
 }

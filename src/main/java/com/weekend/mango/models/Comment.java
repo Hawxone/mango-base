@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.joda.time.DateTime;
 
 @Data
 @Builder
@@ -12,5 +13,7 @@ import lombok.NoArgsConstructor;
 public class Comment {
     Long id;
     String comment;
+    DateTime createdAt;
     UserModel user;
+    Long mangaId;
 }

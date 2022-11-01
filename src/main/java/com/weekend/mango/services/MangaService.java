@@ -9,7 +9,7 @@ public interface MangaService {
 
     Manga createManga(Manga mangaModel) throws Exception;
 
-    Manga getMangaById(Long id) throws Exception;
+    Manga getMangaById(Long id, Long user) throws Exception;
 
     Manga saveManga(Long id,Manga mangaModel) throws Exception;
 
