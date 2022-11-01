@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @CrossOrigin(value = "http://localhost:3000")
 @RestController
-@RequestMapping("/api/v1/manga/comment")
+@RequestMapping("/api/v1/comment")
 public class CommentController {
 
     private final CommentService commentService;
@@ -33,14 +33,14 @@ public class CommentController {
         this.commentEntityRepository = commentEntityRepository;
     }
 
-    @GetMapping("/{mangaId}")
+    @GetMapping("/manga/{mangaId}")
     public ResponseEntity<List<Comment>> getCommentsByMangaId(@PathVariable Long mangaId) throws Exception {
 
         List<Comment> commentList = commentService.getCommentsByMangaId(mangaId);
 
         return ResponseEntity.ok(commentList);
     }
-    @PostMapping("/{mangaId}/user/{userId}")
+    @PostMapping("/manga/{mangaId}/user/{userId}/")
     public ResponseEntity<Comment> createComment(@PathVariable Long mangaId,@PathVariable Long userId, @RequestParam Map<String,String> request) throws Exception {
 
         String comment = request.get("comment");
@@ -64,12 +64,12 @@ public class CommentController {
         return ResponseEntity.ok(commentModel);
     }
 
-    @PutMapping("/commentid/{id}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Long id,@RequestParam Map<String,String> request) throws Exception {
+    @PutMapping("/{commentId}")
+    public ResponseEntity<Comment> updateComment(@PathVariable Long commentId,@RequestParam Map<String,String> request) throws Exception {
         String comment = request.get("comment");
 
         Comment commentModel = new Comment();
-        Optional<CommentEntity> fetchComment = commentEntityRepository.findById(id);
+        Optional<CommentEntity> fetchComment = commentEntityRepository.findById(commentId);
         if (fetchComment.isPresent()){
             commentModel.setId(fetchComment.get().getId());
             commentModel.setComment(comment);
@@ -92,7 +92,7 @@ public class CommentController {
 
     }
 
-    @DeleteMapping("/commentid/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String,Boolean>> deleteComment(@PathVariable Long id) throws Exception {
 
         boolean deleted;
