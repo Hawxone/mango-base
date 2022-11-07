@@ -29,6 +29,12 @@ public class ParodyController {
         return ResponseEntity.ok(parodies);
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String,Object>> getPaginatedParodies(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size){
+        Map<String,Object> parodiesList = parodyService.getPaginatedParodies(page,size);
+        return ResponseEntity.ok(parodiesList);
+    }
+
     @PostMapping
     public ResponseEntity<Parody> saveParody(@RequestParam Map<String,String> request) throws Exception{
 

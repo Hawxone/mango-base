@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Parody {
-    Long id;
-    String name;
-    Long mangaCount;
+public class Message {
+    private String content;
 }

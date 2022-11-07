@@ -1,21 +1,40 @@
 package com.weekend.mango.services;
 
 import com.weekend.mango.entities.ParodyEntity;
+import com.weekend.mango.models.PageIndex;
 import com.weekend.mango.models.Parody;
+import com.weekend.mango.repositories.MangaEntityRepository;
 import com.weekend.mango.repositories.ParodyEntityRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
 public class ParodyServiceImpl implements ParodyService{
 
     private final ParodyEntityRepository parodyEntityRepository;
+    private final MangaEntityRepository mangaEntityRepository;
 
-    public ParodyServiceImpl(ParodyEntityRepository parodyEntityRepository) {
+    public ParodyServiceImpl(ParodyEntityRepository parodyEntityRepository, MangaEntityRepository mangaEntityRepository) {
         this.parodyEntityRepository = parodyEntityRepository;
+        this.mangaEntityRepository = mangaEntityRepository;
+    }
+
+    private long findFirst(Iterator<ParodyEntity> iterator, Long id) {
+
+        long index = 0;
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(id)) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
     }
 
     @Override
@@ -29,6 +48,48 @@ public class ParodyServiceImpl implements ParodyService{
                         .name(parodyEntity.getName())
                         .build()
         ).toList();
+    }
+
+    @Override
+    public Map<String, Object> getPaginatedParodies(int page, int size) {
+
+        List<Parody> parodyList = new ArrayList<>();
+        Pageable paging = PageRequest.of(page,size).withSort(Sort.by("name").ascending());
+        Page<ParodyEntity> parodyEntities = parodyEntityRepository.findAll(paging);
+        Iterable<ParodyEntity> parodyEntityIterable = parodyEntityRepository.findAll(paging.getSort());
+
+        List<PageIndex> pageIndices = new ArrayList<>();
+
+        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        {
+            ParodyEntity parodyAlphabet = parodyEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
+            if (parodyAlphabet != null){
+                PageIndex pageIndex = new PageIndex();
+                pageIndex.setName(String.valueOf(alphabet));
+                pageIndex.setIndex(findFirst(parodyEntityIterable.iterator(),parodyAlphabet.getId()));
+                pageIndices.add(pageIndex);
+
+            }
+        }
+
+        for (ParodyEntity p: parodyEntities
+             ) {
+            Long mangaCount = mangaEntityRepository.countMangaEntitiesByParodyId(p.getId());
+            Parody parody = new Parody();
+            parody.setId(p.getId());
+            parody.setName(p.getName());
+            parody.setMangaCount(mangaCount);
+            parodyList.add(parody);
+        }
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("parodyList",parodyList);
+        response.put("currentPage",parodyEntities.getNumber());
+        response.put("totalItems",parodyEntities.getTotalElements());
+        response.put("totalPages",parodyEntities.getTotalPages());
+        response.put("index",pageIndices);
+
+        return response;
     }
 
     @Override
@@ -81,4 +142,6 @@ public class ParodyServiceImpl implements ParodyService{
 
         return true;
     }
+
+
 }

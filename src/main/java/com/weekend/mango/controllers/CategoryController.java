@@ -29,6 +29,12 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String,Object>> getPaginatedCategories(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size){
+        Map<String,Object> categoriesList = categoryService.getPaginatedCategories(page,size);
+        return ResponseEntity.ok(categoriesList);
+    }
+
     @PostMapping
     public ResponseEntity<Category> saveCategory(@RequestParam Map<String,String> request) throws Exception{
 

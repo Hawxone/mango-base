@@ -9,6 +9,7 @@ import com.weekend.mango.repositories.PageEntityRepository;
 import com.weekend.mango.services.PageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +51,7 @@ public class PageController {
     }
 
     @PostMapping("/{mangaId}/pages")
-    public ResponseEntity<PageModel> createMangaPage(@PathVariable Long mangaId, @RequestParam Map<String,String> request) throws Exception {
+    public ResponseEntity<PageModel> createMangaPage(@PathVariable Long mangaId, @RequestParam Map<String,String> request,@RequestParam Map<String, MultipartFile> files) throws Exception {
         try {
             Optional<MangaEntity> fetchManga = getManga(mangaId);
 
@@ -61,7 +62,7 @@ public class PageController {
                 PageModel pageModel = new PageModel();
                 pageModel.setFile(file);
                 pageModel.setPageOrder(pageOrder);
-                pageModel = pageService.createMangaPage(mangaId,pageModel);
+                pageModel = pageService.createMangaPage(mangaId,pageModel,files.get("file"));
                 return ResponseEntity.ok(pageModel);
             }else {
                 throw new Exception("manga not found!");

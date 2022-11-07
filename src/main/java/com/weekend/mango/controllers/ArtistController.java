@@ -29,6 +29,12 @@ public class ArtistController {
         return ResponseEntity.ok(artistList);
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String,Object>> getPaginatedArtists(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size){
+        Map<String,Object> artistList = artistService.getPaginatedArtists(page,size);
+        return ResponseEntity.ok(artistList);
+    }
+
     @PostMapping
     public ResponseEntity<Artist> saveArtist(@RequestParam Map<String,String> request) throws Exception{
 

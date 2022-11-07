@@ -28,6 +28,12 @@ public class CharacterController {
         return ResponseEntity.ok(characters);
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String,Object>> getPaginatedCharacters(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size){
+        Map<String,Object> characterList = characterService.getPaginatedCharacters(page,size);
+        return ResponseEntity.ok(characterList);
+    }
+
     @PostMapping
     public ResponseEntity<Character> saveCharacter(@RequestParam Map<String,String> request) throws Exception{
 

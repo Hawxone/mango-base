@@ -98,7 +98,7 @@ public class AuthController {
 
 
         if (strRoles == null){
-            RoleEntity userRole = roleEntityRepository.findByName("USER")
+            RoleEntity userRole = roleEntityRepository.findByName("ROLE_USER")
                     .orElseThrow(()-> new RuntimeException("Role is not found"));
             roles.add(userRole);
         }else{
@@ -106,17 +106,17 @@ public class AuthController {
             strRoles.forEach(role-> {
                 switch (role) {
                     case "admin" -> {
-                        RoleEntity adminRole = roleEntityRepository.findByName("ADMIN")
+                        RoleEntity adminRole = roleEntityRepository.findByName("ROLE_ADMIN")
                                 .orElseThrow(() -> new RuntimeException("Error: role is not found"));
                         roles.add(adminRole);
                     }
                     case "mod" -> {
-                        RoleEntity modRole = roleEntityRepository.findByName("MODERATOR")
+                        RoleEntity modRole = roleEntityRepository.findByName("ROLE_MODERATOR")
                                 .orElseThrow(() -> new RuntimeException("Error: role is not found"));
                         roles.add(modRole);
                     }
                     default -> {
-                        RoleEntity userRole = roleEntityRepository.findByName("USER")
+                        RoleEntity userRole = roleEntityRepository.findByName("ROLE_USER")
                                 .orElseThrow(() -> new RuntimeException("Error: role is not found"));
                         roles.add(userRole);
                     }

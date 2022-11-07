@@ -28,6 +28,12 @@ public class GroupController {
         return ResponseEntity.ok(groups);
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String,Object>> getPaginatedGroups(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size){
+        Map<String,Object> groupList = groupService.getPaginatedGroups(page,size);
+        return ResponseEntity.ok(groupList);
+    }
+
     @PostMapping
     public ResponseEntity<Group> saveGroup(@RequestParam Map<String,String> request) throws Exception{
 

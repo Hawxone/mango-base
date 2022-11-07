@@ -57,6 +57,13 @@ public class UserEntity {
     @OneToMany(cascade= CascadeType.ALL,mappedBy = "user",fetch = FetchType.LAZY)
     private List<CommentEntity> comment = new ArrayList<>();
 
+    @OneToMany(cascade= CascadeType.ALL,mappedBy = "userTo",fetch = FetchType.LAZY)
+    private List<NotificationEntity> notificationTo = new ArrayList<>();
+
+    @OneToMany(cascade= CascadeType.ALL,mappedBy = "userFrom",fetch = FetchType.LAZY)
+    private List<NotificationEntity> notificationFrom = new ArrayList<>();
+
+
 
 
     @ManyToMany(fetch = FetchType.LAZY)

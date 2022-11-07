@@ -29,6 +29,13 @@ public class TagController {
         return ResponseEntity.ok(tags);
     }
 
+    @GetMapping("/paginated")
+    public ResponseEntity<Map<String,Object>> getPaginatedTags(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size){
+
+        Map<String,Object> tagList = tagService.getPaginatedTags(page,size);
+        return ResponseEntity.ok(tagList);
+    }
+
     @PostMapping
     public ResponseEntity<Tag> saveTag(@RequestParam Map<String,String> request) throws Exception{
 

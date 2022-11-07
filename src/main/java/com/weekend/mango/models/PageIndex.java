@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Parody {
-    Long id;
+public class PageIndex {
+
     String name;
-    Long mangaCount;
+    Long index;
 }

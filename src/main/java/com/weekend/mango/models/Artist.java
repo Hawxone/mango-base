@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class Artist {
     Long id;
     String name;
+    Long mangaCount;
 }

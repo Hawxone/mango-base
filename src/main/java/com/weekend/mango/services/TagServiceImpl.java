@@ -1,21 +1,39 @@
 package com.weekend.mango.services;
 
 import com.weekend.mango.entities.TagEntity;
+import com.weekend.mango.models.PageIndex;
 import com.weekend.mango.models.Tag;
+import com.weekend.mango.repositories.MangaEntityRepository;
 import com.weekend.mango.repositories.TagEntityRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-
+import java.util.*;
 
 @Service
 public class TagServiceImpl implements TagService{
 
     private final TagEntityRepository tagEntityRepository;
+    private final MangaEntityRepository mangaEntityRepository;
 
-    public TagServiceImpl(TagEntityRepository tagEntityRepository) {
+    public TagServiceImpl(TagEntityRepository tagEntityRepository, MangaEntityRepository mangaEntityRepository) {
         this.tagEntityRepository = tagEntityRepository;
+        this.mangaEntityRepository = mangaEntityRepository;
+    }
+
+    private long findFirst(Iterator<TagEntity> iterator, Long id) {
+
+        long index = 0;
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(id)) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
     }
 
     @Override
@@ -29,6 +47,52 @@ public class TagServiceImpl implements TagService{
                         .name(tagEntity.getName())
                         .build()
         ).toList();
+    }
+
+
+    @Override
+    public Map<String, Object> getPaginatedTags(int page, int size) {
+
+        List<Tag>tagList=new ArrayList<>();
+
+        Pageable paging = PageRequest.of(page,size).withSort(Sort.by("name").ascending());
+
+        Page<TagEntity> tagEntities = tagEntityRepository.findAll(paging);
+        Iterable<TagEntity> tagEntitiesIterator = tagEntityRepository.findAll(paging.getSort());
+
+
+        List<PageIndex> pageIndices = new ArrayList<>();
+
+        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        {
+            TagEntity tagAlphabet = tagEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
+            if (tagAlphabet != null){
+                PageIndex pageIndex = new PageIndex();
+                pageIndex.setName(String.valueOf(alphabet));
+                pageIndex.setIndex(findFirst(tagEntitiesIterator.iterator(),tagAlphabet.getId()));
+                pageIndices.add(pageIndex);
+            }
+
+        }
+
+        for (TagEntity a:tagEntities
+        ) {
+            Long mangaCount = mangaEntityRepository.countMangaEntitiesByTagId(a.getId());
+            Tag tag = new Tag();
+            tag.setId(a.getId());
+            tag.setName(a.getName());
+            tag.setMangaCount(mangaCount);
+            tagList.add(tag);
+        }
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("tagList",tagList);
+        response.put("currentPage",tagEntities.getNumber());
+        response.put("totalItems",tagEntities.getTotalElements());
+        response.put("totalPages",tagEntities.getTotalPages());
+        response.put("index",pageIndices);
+
+        return response;
     }
 
     @Override
@@ -79,4 +143,5 @@ public class TagServiceImpl implements TagService{
         }
         return true;
     }
+
 }

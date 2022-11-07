@@ -2,20 +2,39 @@ package com.weekend.mango.services;
 
 import com.weekend.mango.entities.GroupEntity;
 import com.weekend.mango.models.Group;
+import com.weekend.mango.models.PageIndex;
 import com.weekend.mango.repositories.GroupEntityRepository;
+import com.weekend.mango.repositories.MangaEntityRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
 public class GroupServiceImpl implements GroupService{
 
     private final GroupEntityRepository groupEntityRepository;
+    private final MangaEntityRepository mangaEntityRepository;
 
-    public GroupServiceImpl(GroupEntityRepository groupEntityRepository) {
+    public GroupServiceImpl(GroupEntityRepository groupEntityRepository, MangaEntityRepository mangaEntityRepository) {
         this.groupEntityRepository = groupEntityRepository;
+        this.mangaEntityRepository = mangaEntityRepository;
+    }
+
+    private long findFirst(Iterator<GroupEntity> iterator, Long id) {
+
+        long index = 0;
+        while (iterator.hasNext()) {
+            if (iterator.next().getId().equals(id)) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
     }
 
     @Override
@@ -29,6 +48,46 @@ public class GroupServiceImpl implements GroupService{
                         .name(groupEntity.getName())
                         .build()
         ).toList();
+    }
+
+    @Override
+    public Map<String, Object> getPaginatedGroups(int page, int size) {
+
+        List<Group> groupList = new ArrayList<>();
+        Pageable paging = PageRequest.of(page,size).withSort(Sort.by("name").ascending());
+        Page<GroupEntity> groupEntities = groupEntityRepository.findAll(paging);
+        Iterable<GroupEntity> groupEntityIterable = groupEntityRepository.findAll(paging.getSort());
+
+        List<PageIndex> pageIndices = new ArrayList<>();
+        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        {
+            GroupEntity groupAlphabet = groupEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
+            if (groupAlphabet != null){
+                PageIndex pageIndex = new PageIndex();
+                pageIndex.setName(String.valueOf(alphabet));
+                pageIndex.setIndex(findFirst(groupEntityIterable.iterator(),groupAlphabet.getId()));
+                pageIndices.add(pageIndex);
+            }
+        }
+
+        for (GroupEntity g:groupEntities
+             ) {
+            Long mangaCount = mangaEntityRepository.countMangaEntitiesByGroupId(g.getId());
+            Group group = new Group();
+            group.setId(g.getId());
+            group.setName(g.getName());
+            group.setMangaCount(mangaCount);
+            groupList.add(group);
+        }
+
+        Map<String,Object> response = new HashMap<>();
+        response.put("groupList",groupList);
+        response.put("currentPage",groupEntities.getNumber());
+        response.put("totalItems",groupEntities.getTotalElements());
+        response.put("totalPages",groupEntities.getTotalPages());
+        response.put("index",pageIndices);
+
+        return response;
     }
 
     @Override
@@ -82,4 +141,6 @@ public class GroupServiceImpl implements GroupService{
 
         return true;
     }
+
+
 }
