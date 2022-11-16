@@ -59,7 +59,7 @@ public class ArtistServiceImpl implements ArtistService{
 
         List<PageIndex> pageIndices = new ArrayList<>();
 
-        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        for(char alphabet = 'a'; alphabet <='z'; alphabet++ )
         {
             ArtistEntity artistAlphabet = artistEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
             if (artistAlphabet != null){

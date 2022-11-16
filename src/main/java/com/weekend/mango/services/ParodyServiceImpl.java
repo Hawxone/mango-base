@@ -60,7 +60,7 @@ public class ParodyServiceImpl implements ParodyService{
 
         List<PageIndex> pageIndices = new ArrayList<>();
 
-        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        for(char alphabet = 'a'; alphabet <='z'; alphabet++ )
         {
             ParodyEntity parodyAlphabet = parodyEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
             if (parodyAlphabet != null){

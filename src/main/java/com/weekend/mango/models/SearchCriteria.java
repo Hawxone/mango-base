@@ -5,17 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MangaList {
-
-    Long id;
-    Integer orderId;
-    String title;
-    Long pageCount;
-    String verdict;
-
+public class SearchCriteria {
+    String key;
+    String operation;
+    String value;
 }

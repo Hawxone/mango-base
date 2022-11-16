@@ -22,8 +22,8 @@ public class Manga {
     DateTime createdAt;
     UserModel createdBy;
     DateTime uploadDate;
-    List<MangaUser> mangaUser;
-    List<PageModel> pageModel;
+    Long pageCount;
+    MangaUser mangaUser;
     List<Artist> artist;
     List<Group> group;
     List<Category> category;

@@ -59,7 +59,7 @@ public class CharacterServiceImpl implements CharacterService{
 
         List<PageIndex> pageIndices = new ArrayList<>();
 
-        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        for(char alphabet = 'a'; alphabet <='z'; alphabet++ )
         {
             CharacterEntity characterAlphabet = characterEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
             if (characterAlphabet != null){

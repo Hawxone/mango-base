@@ -27,9 +27,13 @@ public class MangaServiceImpl implements MangaService{
     private final ParodyEntityRepository parodyEntityRepository;
     private final TagEntityRepository tagEntityRepository;
     private final UserTagEntityRepository userTagEntityRepository;
+    private final PageEntityRepository pageEntityRepository;
+
+    private final MangaUserService mangaUserService;
 
 
-    public MangaServiceImpl(MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository, ArtistEntityRepository artistEntityRepository, CategoryEntityRepository categoryEntityRepository, CharacterEntityRepository characterEntityRepository, GroupEntityRepository groupEntityRepository, ParodyEntityRepository parodyEntityRepository, TagEntityRepository tagEntityRepository, UserTagEntityRepository userTagEntityRepository) {
+
+    public MangaServiceImpl(MangaEntityRepository mangaEntityRepository, UserEntityRepository userEntityRepository, ArtistEntityRepository artistEntityRepository, CategoryEntityRepository categoryEntityRepository, CharacterEntityRepository characterEntityRepository, GroupEntityRepository groupEntityRepository, ParodyEntityRepository parodyEntityRepository, TagEntityRepository tagEntityRepository, UserTagEntityRepository userTagEntityRepository, PageEntityRepository pageEntityRepository, MangaUserService mangaUserService) {
         this.mangaEntityRepository = mangaEntityRepository;
         this.userEntityRepository = userEntityRepository;
         this.artistEntityRepository = artistEntityRepository;
@@ -39,6 +43,8 @@ public class MangaServiceImpl implements MangaService{
         this.parodyEntityRepository = parodyEntityRepository;
         this.tagEntityRepository = tagEntityRepository;
         this.userTagEntityRepository = userTagEntityRepository;
+        this.pageEntityRepository = pageEntityRepository;
+        this.mangaUserService = mangaUserService;
     }
 
     private Optional<UserEntity> getUser(Long id){
@@ -68,20 +74,29 @@ public class MangaServiceImpl implements MangaService{
         try {
 
             UserModel userModel = new UserModel();
+            MangaUser mangaUser = new MangaUser();
+
 
             List<Artist> artistList = new ArrayList<>();
             List<Category> categoryList = new ArrayList<>();
             List<Comment> commentList = new ArrayList<>();
-            List<MangaUser> mangaUserList = new ArrayList<>();
             List<Group> groupList = new ArrayList<>();
             List<Character> characterList = new ArrayList<>();
             List<Tag> tagList = new ArrayList<>();
             List<Parody> parodyList = new ArrayList<>();
-
+            List<UserTagEntity> likedUserTagEntities = new ArrayList<>();
+            List<UserTagEntity> dislikedUserTagEntities = new ArrayList<>();
 
             if (mangaEntity.isPresent()){
                 Optional<UserEntity> user = getUser(mangaEntity.get().getCreatedBy().getId());
                 Optional<UserEntity> checkUser = getUser(userId);
+
+
+                if (checkUser.isPresent()){
+                    mangaUser=mangaUserService.getMangaUserByMangaAndUser(mangaEntity.get().getId(),checkUser.get().getId());
+                    likedUserTagEntities = userTagEntityRepository.findUserTagEntitiesByUser_IdAndIsLikeIsTrue(checkUser.get().getId());
+                    dislikedUserTagEntities = userTagEntityRepository.findUserTagEntitiesByUser_IdAndIsLikeIsFalse(checkUser.get().getId());
+                }
 
                 if (user.isPresent()){
                     userModel.setUsername(user.get().getUsername());
@@ -91,31 +106,24 @@ public class MangaServiceImpl implements MangaService{
                     throw new Exception("no user found");
                 }
 
-                if (checkUser.isPresent()){
-                    for (MangaUserEntity a:mangaEntity.get().getMangaUser()
-                    ) {
-                        MangaUser mangaUser = new MangaUser();
-                        mangaUser.setId(a.getId());
-                        mangaUser.setCurrentPage(a.getCurrentPage());
-                        mangaUser.setIsFavorite(a.getIsFavorite());
-                        mangaUser.setIsWillRead(a.getIsWillRead());
-                        mangaUserList.add(mangaUser);
-                    }
-                }
 
                 for (ArtistEntity a:mangaEntity.get().getArtist()
                 ) {
+                    Long mangaCountByArtistTag = mangaEntityRepository.countMangaEntitiesByArtistId(a.getId());
                     Artist artist = new Artist();
                     artist.setId(a.getId());
                     artist.setName(a.getName());
+                    artist.setMangaCount(mangaCountByArtistTag);
                     artistList.add(artist);
                 }
 
                 for (CategoryEntity a:mangaEntity.get().getCategory()
                 ) {
+                    Long mangaCountByCategoryTag= mangaEntityRepository.countMangaEntitiesByCategoryId(a.getId());
                     Category category = new Category();
                     category.setId(a.getId());
                     category.setName(a.getName());
+                    category.setMangaCount(mangaCountByCategoryTag);
                     categoryList.add(category);
                 }
 
@@ -135,40 +143,71 @@ public class MangaServiceImpl implements MangaService{
                 }
 
 
-
                 for (GroupEntity a:mangaEntity.get().getGroup()
                 ) {
+                    Long mangaCountByGroupTag = mangaEntityRepository.countMangaEntitiesByGroupId(a.getId());
                     Group group = new Group();
                     group.setId(a.getId());
                     group.setName(a.getName());
+                    group.setMangaCount(mangaCountByGroupTag);
                     groupList.add(group);
                 }
 
                 for (CharacterEntity a:mangaEntity.get().getCharacter()
                 ) {
+                    Long mangaCountByCharacterTag = mangaEntityRepository.countMangaEntitiesByCharacterId(a.getId());
                     Character character = new Character();
                     character.setId(a.getId());
                     character.setName(a.getName());
+                    character.setMangaCount(mangaCountByCharacterTag);
                     characterList.add(character);
                 }
 
                 for (TagEntity a:mangaEntity.get().getTag()
                 ) {
+
+                    Long mangaCountByTag = mangaEntityRepository.countMangaEntitiesByTagId(a.getId());
                     Tag tag = new Tag();
                     tag.setId(a.getId());
                     tag.setName(a.getName());
+                    tag.setMangaCount(mangaCountByTag);
+                    if (likedUserTagEntities.size()>0){
+                        for (UserTagEntity u:likedUserTagEntities
+                             ) {
+                            if (a.getId().equals(u.getTag().getId())){
+
+                                tag.setIsLiked(true);
+                            }
+                        }
+                    }
+
+                    if (dislikedUserTagEntities.size()>0) {
+                        for (UserTagEntity u:dislikedUserTagEntities
+                        ) {
+                            if (a.getId().equals(u.getTag().getId())){
+                                tag.setIsLiked(false);
+
+                            }
+                        }
+                    }
+
                     tagList.add(tag);
+
+
+
                 }
 
                 for (ParodyEntity a:mangaEntity.get().getParody()
                 ) {
+                    Long mangaCountByParody = mangaEntityRepository.countMangaEntitiesByParodyId(a.getId());
                     Parody parody = new Parody();
                     parody.setId(a.getId());
                     parody.setName(a.getName());
+                    parody.setMangaCount(mangaCountByParody);
                     parodyList.add(parody);
                 }
 
-
+                Long pageCount = pageEntityRepository.countPageEntitiesByMangaId_Id(mangaEntity.get().getId());
                 Manga manga = new Manga();
 
                 manga.setId(mangaEntity.get().getId());
@@ -176,56 +215,83 @@ public class MangaServiceImpl implements MangaService{
                 manga.setMangaOrder(mangaEntity.get().getMangaOrder());
                 manga.setCreatedAt(mangaEntity.get().getCreatedAt());
                 manga.setCreatedBy(userModel);
+                manga.setPageCount(pageCount);
                 manga.setUploadDate(mangaEntity.get().getUploadDate());
                 manga.setArtist(artistList);
                 manga.setCategory(categoryList);
                 manga.setComment(commentList);
-                manga.setMangaUser(mangaUserList);
                 manga.setGroup(groupList);
                 manga.setCharacter(characterList);
                 manga.setTag(tagList);
                 manga.setParody(parodyList);
-
+                if (checkUser.isPresent()){
+                    manga.setMangaUser(mangaUser);
+                }
                 return manga;
             }else {
                 throw new Exception("can't find entry");
             }
 
         }catch (Exception e){
-            throw new Exception("can't find entry" + e);
+            throw   new Exception("can't find entry" + e);
         }
 
     }
 
-    @Override
-    public Map<String, Object> getPaginatedMangaList(int page, int size, Long userId) {
-        List<MangaList>mangaLists =new ArrayList<>();
-        List<UserTag> userTags = new ArrayList<>();
-        Pageable paging = PageRequest.of(page,size);
-
-        Page<MangaEntity> mangaEntities = mangaEntityRepository.findAll(paging);
+    private Map<String, Object> getMangaList(Long userId, List<MangaList> mangaLists, Page<MangaEntity> mangaEntities) {
 
         for (MangaEntity a:mangaEntities
-             ) {
+        ) {
+            Long pageCount = pageEntityRepository.countPageEntitiesByMangaId_Id(a.getId());
             MangaList mangaList = new MangaList();
             mangaList.setId(a.getId());
             mangaList.setTitle(a.getTitle());
+            mangaList.setOrderId(a.getMangaOrder());
+            mangaList.setPageCount(pageCount);
 
             Optional<UserEntity> fetchUser = getUser(userId);
 
             if (fetchUser.isPresent()){
-                for (TagEntity b:a.getTag()
-                     ) {
-                    Optional<UserTagEntity> fetchUserTag = userTagEntityRepository.findUserTagEntityByUser_IdAndTag_Id(fetchUser.get().getId(), b.getId());
-                    if (fetchUserTag.isPresent()){
-                       if (fetchUserTag.get().getTag().getId().equals(b.getId())){
-                           UserTag userTag = new UserTag();
-                           userTag.setIsFavorite(fetchUserTag.get().getIsLike());
-                           userTags.add(userTag);
-                           mangaList.setUserTag(userTags);
-                       }
+                int likedTagCount = 0;
+                int dislikedTagCount = 0;
+
+                List<UserTagEntity> likedTag = userTagEntityRepository.findUserTagEntitiesByUser_IdAndIsLikeIsTrue(userId);
+                List<UserTagEntity> dislikedTag = userTagEntityRepository.findUserTagEntitiesByUser_IdAndIsLikeIsFalse(userId);
+
+                if (dislikedTag!=null){
+                    for (TagEntity t:a.getTag()
+                    ) {
+                        for (UserTagEntity u:dislikedTag
+                             ) {
+                            if (t.getId().equals(u.getTag().getId())){
+                                dislikedTagCount++;
+                            }
+                        }
                     }
                 }
+
+               if (likedTag!=null){
+                   for (TagEntity t:a.getTag()
+                   ) {
+                       for (UserTagEntity u:likedTag
+                       ) {
+                           if (t.getId().equals(u.getTag().getId())){
+                               likedTagCount++;
+                           }
+                       }
+                   }
+               }
+               
+               if (dislikedTagCount>0){
+                   mangaList.setVerdict("disliked");
+               } else if (likedTagCount>0) {
+                   mangaList.setVerdict("liked");
+               }else{
+                   mangaList.setVerdict("unknown");
+               }
+
+            }else {
+                mangaList.setVerdict("unknown");
             }
 
             mangaLists.add(mangaList);
@@ -240,6 +306,71 @@ public class MangaServiceImpl implements MangaService{
         return response;
     }
 
+
+
+    @Override
+    public Map<String, Object> getMangaResultList(int page, int size, String query,Long userId) {
+        List<MangaList>mangaLists =new ArrayList<>();
+
+        Pageable paging = PageRequest.of(page,size).withSort(Sort.by(Sort.Direction.DESC,"mangaOrder"));
+        Page<MangaEntity> mangaEntities = mangaEntityRepository.searchManga(query,paging);
+        return getMangaList(userId, mangaLists, mangaEntities);
+    }
+
+    @Override
+    public Map<String, Object> getMangasByTagName(int page, int size, String query, String tagType, Long userId) {
+
+        List<MangaList> mangaLists = new ArrayList<>();
+
+        Pageable paging = PageRequest.of(page,size);
+        Page<MangaEntity> mangaEntities;
+
+        Map<String,Object> response  = new HashMap<>();
+
+        switch (tagType) {
+            case "artist" -> {
+
+                mangaEntities = mangaEntityRepository.getMangaEntitiesByArtistNameIgnoreCase(query, paging);
+                response = getMangaList(userId, mangaLists, mangaEntities);
+            }
+            case "category" -> {
+                mangaEntities = mangaEntityRepository.getMangaEntitiesByCategoryNameIgnoreCase(query, paging);
+                response = getMangaList(userId, mangaLists, mangaEntities);
+            }
+            case "character" -> {
+                mangaEntities = mangaEntityRepository.getMangaEntitiesByCharacterNameIgnoreCase(query, paging);
+                response = getMangaList(userId, mangaLists, mangaEntities);
+            }
+            case "group" -> {
+                mangaEntities = mangaEntityRepository.getMangaEntitiesByGroupNameIgnoreCase(query, paging);
+                response = getMangaList(userId, mangaLists, mangaEntities);
+            }
+            case "parody" -> {
+                mangaEntities = mangaEntityRepository.getMangaEntitiesByParodyNameIgnoreCase(query, paging);
+                response = getMangaList(userId, mangaLists, mangaEntities);
+            }
+            case "tag" -> {
+                mangaEntities = mangaEntityRepository.getMangaEntitiesByTagNameIgnoreCase(query, paging);
+                response = getMangaList(userId, mangaLists, mangaEntities);
+            }
+        }
+        return response;
+    }
+
+
+
+    @Override
+    public Map<String, Object> getPaginatedMangaList(int page, int size, Long userId) {
+        List<MangaList>mangaLists =new ArrayList<>();
+
+        Pageable paging = PageRequest.of(page,size).withSort(Sort.by(Sort.Direction.DESC,"mangaOrder"));
+
+        Page<MangaEntity> mangaEntities = mangaEntityRepository.findAllByMangaOrderNotNull(paging);
+
+        return getMangaList(userId, mangaLists, mangaEntities);
+    }
+
+
     @Override
     public Map<String, Object> getPaginatedMangaListByUser(int page, int size, Long userId) {
         List<MangaList>mangaLists =new ArrayList<>();
@@ -249,10 +380,12 @@ public class MangaServiceImpl implements MangaService{
 
         for (MangaEntity a:mangaEntities
         ) {
+            Long pageCount = pageEntityRepository.countPageEntitiesByMangaId_Id(a.getId());
             MangaList mangaList = new MangaList();
             mangaList.setId(a.getId());
             mangaList.setTitle(a.getTitle());
-
+            mangaList.setOrderId(a.getMangaOrder());
+            mangaList.setPageCount(pageCount);
 
             mangaLists.add(mangaList);
         }
@@ -326,13 +459,14 @@ public class MangaServiceImpl implements MangaService{
     @Override
     public Manga getMangaByOrderId(Integer id, Long userId) throws Exception {
 
-        Optional<MangaEntity> mangaEntity = mangaEntityRepository.findMangaEntitiesByMangaOrder(id);
+        Optional<MangaEntity> mangaEntity = mangaEntityRepository.findMangaEntityByMangaOrder(id);
 
         Manga manga;
         manga = getManga(mangaEntity,userId);
 
         return manga;
     }
+
 
     @Override
     public Manga getMangaById(Long id, Long userId) throws Exception {

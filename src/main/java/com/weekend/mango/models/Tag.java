@@ -13,4 +13,5 @@ public class Tag {
     Long id;
     String name;
     Long mangaCount;
+    Boolean isLiked;
 }

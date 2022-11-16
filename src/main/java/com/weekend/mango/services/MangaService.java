@@ -20,4 +20,8 @@ public interface MangaService {
     boolean publishManga(Long id) throws Exception;
 
     Manga getMangaByOrderId(Integer id, Long userId) throws Exception;
+
+    Map<String, Object> getMangaResultList(int page, int size, String query,Long userId);
+
+    Map<String, Object> getMangasByTagName(int page, int size, String query, String tagType, Long userId);
 }

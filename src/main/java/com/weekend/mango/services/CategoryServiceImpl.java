@@ -114,7 +114,7 @@ public class CategoryServiceImpl implements CategoryService{
 
         List<PageIndex> pageIndices = new ArrayList<>();
 
-        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        for(char alphabet = 'a'; alphabet <='z'; alphabet++ )
         {
             CategoryEntity categoryAlphabet = categoryEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
             if (categoryAlphabet != null){

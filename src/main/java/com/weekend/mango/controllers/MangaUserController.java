@@ -27,11 +27,12 @@ public class MangaUserController {
     }
 
     @PostMapping("/manga/{mangaId}/user/{userId}")
-    public ResponseEntity<MangaUser> createMangaUser(@PathVariable Long mangaId, @PathVariable Long userId, @RequestParam Map<String,String> request) throws Exception{
+    public ResponseEntity<MangaUser> createOrUpdateMangaUser(@PathVariable Long mangaId, @PathVariable Long userId, @RequestParam Map<String,String> request) throws Exception{
 
         String isWillRead = request.get("isWillRead");
         String isFavorite = request.get("isFavorite");
         String currentPage = request.get("currentPage");
+
 
         MangaUser mangaUserModel = new MangaUser();
         mangaUserModel.setIsWillRead(Boolean.parseBoolean(isWillRead));
@@ -39,14 +40,15 @@ public class MangaUserController {
         mangaUserModel.setCurrentPage(Integer.parseInt(currentPage));
         mangaUserModel.setMangaId(mangaId);
         mangaUserModel.setUserId(userId);
-        mangaUserModel = mangaUserService.createMangaUser(mangaUserModel);
+
+
+        mangaUserModel = mangaUserService.createOrUpdateMangaUser(mangaUserModel);
 
         return ResponseEntity.ok(mangaUserModel);
     }
 
     @PutMapping("/manga/{mangaId}/user/{userId}")
     public ResponseEntity<MangaUser> updateMangaUser(@PathVariable Long mangaId, @PathVariable Long userId, @RequestParam Map<String,String> request)throws Exception{
-
         String isWillRead = request.get("isWillRead");
         String isFavorite = request.get("isFavorite");
         String currentPage = request.get("currentPage");

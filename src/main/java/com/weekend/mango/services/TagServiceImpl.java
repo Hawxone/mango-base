@@ -63,7 +63,7 @@ public class TagServiceImpl implements TagService{
 
         List<PageIndex> pageIndices = new ArrayList<>();
 
-        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        for(char alphabet = 'a'; alphabet <='z'; alphabet++ )
         {
             TagEntity tagAlphabet = tagEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
             if (tagAlphabet != null){

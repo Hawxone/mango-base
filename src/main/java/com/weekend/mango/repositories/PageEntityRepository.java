@@ -18,4 +18,6 @@ public interface PageEntityRepository extends JpaRepository<PageEntity,Long> {
 
     Optional<PageEntity> findPageEntityByIdAndMangaId(Long id, MangaEntity mangaId);
 
+    Long countPageEntitiesByMangaId_Id(Long mangaId);
+
 }

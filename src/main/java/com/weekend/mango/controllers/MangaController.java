@@ -29,6 +29,20 @@ public class MangaController {
 
     }
 
+    @GetMapping("/tag")
+    public ResponseEntity<Map<String,Object>> getMangasByTagName(@RequestParam String tagType,@RequestParam String tagName,@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size,@RequestParam(defaultValue = "0") Long userId){
+
+        Map<String,Object> result = mangaService.getMangasByTagName(page,size,tagName,tagType,userId);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Map<String,Object>> searchMangas(@RequestParam String query,@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size,@RequestParam(defaultValue = "0") Long userId){
+        Map<String,Object> mangaSearchResult = mangaService.getMangaResultList(page,size,query,userId);
+
+        return ResponseEntity.ok(mangaSearchResult);
+    }
+
     @GetMapping
     public ResponseEntity<Map<String,Object>> getMangas(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size,@RequestParam(defaultValue = "0") Long userId){
 
@@ -39,7 +53,6 @@ public class MangaController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Map<String,Object>> getMangasByUserId(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "24") int size,@PathVariable Long userId){
-
         Map<String, Object> mangaList =mangaService.getPaginatedMangaListByUser(page,size,userId);
 
         return ResponseEntity.ok(mangaList);
@@ -55,7 +68,6 @@ public class MangaController {
 
     @GetMapping("/order/{id}")
     public ResponseEntity<Manga> getMangaByOrderId(@PathVariable Integer id, @RequestParam(defaultValue = "0") Long userId) throws Exception{
-
         Manga mangaDetail = mangaService.getMangaByOrderId(id,userId);
 
         return ResponseEntity.ok(mangaDetail);
@@ -63,7 +75,6 @@ public class MangaController {
 
     @PostMapping
     public ResponseEntity<Manga> createManga(@RequestParam Map<String,String> requests) throws Exception {
-
         try {
             Manga mangaModel = new Manga();
             Optional<UserEntity> fetchUser = userEntityRepository.findById(Long.valueOf(requests.get("userId")));
@@ -125,6 +136,7 @@ public class MangaController {
         JsonArray tagJSON = new Gson().fromJson(tag, JsonArray.class);
         JsonArray parodyJSON = new Gson().fromJson(parody, JsonArray.class);
 
+        MangaUser mangaUserModel = new MangaUser();
         UserModel userModel = new UserModel();
         userModel.setId(userJSON.get("id").getAsLong());
         userModel.setUsername(userJSON.get("username").getAsString());
@@ -133,11 +145,20 @@ public class MangaController {
         List<Artist> artistList = new ArrayList<>();
         List<Category> categoryList = new ArrayList<>();
         List<Comment> commentList = new ArrayList<>();
-        List<MangaUser> mangaUserList = new ArrayList<>();
         List<Group> groupList = new ArrayList<>();
         List<Character> characterList = new ArrayList<>();
         List<Tag> tagList = new ArrayList<>();
         List<Parody> parodyList = new ArrayList<>();
+
+        if (!mangaUser.isBlank()){
+
+
+            mangaUserModel.setId(mangaUserJSON.getAsJsonObject().get("id").getAsLong());
+            mangaUserModel.setCurrentPage(mangaUserJSON.getAsJsonObject().get("currentPage").getAsInt());
+            mangaUserModel.setIsFavorite(mangaUserJSON.getAsJsonObject().get("isFavorite").getAsBoolean());
+            mangaUserModel.setIsWillRead(mangaUserJSON.getAsJsonObject().get("isWillRead").getAsBoolean());
+
+        }
 
         if (!artist.isBlank()){
             for (JsonElement a:artistJSON
@@ -169,19 +190,6 @@ public class MangaController {
                 commentList.add(commentModel);
             }
         }
-
-        if (!mangaUser.isBlank()){
-            for (JsonElement a:mangaUserJSON
-            ) {
-                MangaUser mangaUserModel = new MangaUser();
-                mangaUserModel.setId(a.getAsJsonObject().get("id").getAsLong());
-                mangaUserModel.setCurrentPage(a.getAsJsonObject().get("currentPage").getAsInt());
-                mangaUserModel.setIsFavorite(a.getAsJsonObject().get("isFavorite").getAsBoolean());
-                mangaUserModel.setIsWillRead(a.getAsJsonObject().get("isWillRead").getAsBoolean());
-                mangaUserList.add(mangaUserModel);
-            }
-        }
-
 
         if (!group.isBlank()){
             for (JsonElement a:groupJSON
@@ -244,7 +252,7 @@ public class MangaController {
         mangaModel.setArtist(artistList);
         mangaModel.setCategory(categoryList);
         mangaModel.setComment(commentList);
-        mangaModel.setMangaUser(mangaUserList);
+        mangaModel.setMangaUser(mangaUserModel);
         mangaModel.setGroup(groupList);
         mangaModel.setCharacter(characterList);
         mangaModel.setTag(tagList);

@@ -15,4 +15,7 @@ public interface UserTagEntityRepository extends JpaRepository<UserTagEntity, Lo
     List<UserTagEntity> findUserTagEntitiesByUser_IdAndIsLikeIsFalse(Long id);
     Optional<UserTagEntity> findUserTagEntityByUser_IdAndTag_Id(Long userId, Long tagId);
 
+
+
+
 }

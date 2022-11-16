@@ -59,7 +59,7 @@ public class GroupServiceImpl implements GroupService{
         Iterable<GroupEntity> groupEntityIterable = groupEntityRepository.findAll(paging.getSort());
 
         List<PageIndex> pageIndices = new ArrayList<>();
-        for(char alphabet = 'A'; alphabet <='Z'; alphabet++ )
+        for(char alphabet = 'a'; alphabet <='z'; alphabet++ )
         {
             GroupEntity groupAlphabet = groupEntityRepository.findFirstByNameStartsWith(String.valueOf(alphabet));
             if (groupAlphabet != null){
