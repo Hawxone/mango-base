@@ -28,6 +28,10 @@ public class TagEntity {
     @Size(max = 120)
     private String name;
 
+    @NotBlank
+    @Size(max = 120)
+    private String tagType;
+
     @OneToMany(cascade= CascadeType.ALL,mappedBy = "tag",fetch = FetchType.LAZY)
     private List<UserTagEntity> userTag = new ArrayList<>();
 
